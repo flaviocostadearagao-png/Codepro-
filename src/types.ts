@@ -75,4 +75,7 @@ export interface UserStats {
   activeTrack: TrackType;
   dailyMissions: DailyMission[];
   userToken: string;
+  avatar?: string;
+  lastHeartRegenTime?: string;
+  nickname?: string;
 }

@@ -28,6 +28,8 @@ export default function LeaderboardPanel({
       if (user.isCurrentUser) {
         return {
           ...user,
+          name: stats.nickname || user.name,
+          avatar: stats.avatar || user.avatar,
           level: stats.level,
           xp: stats.xp + (stats.level - 1) * 1500 // simulate baseline XP for level comparisons
         };

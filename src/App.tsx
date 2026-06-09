@@ -44,7 +44,10 @@ export default function App() {
       unlockedAchievements: [],
       activeTrack: 'html',
       dailyMissions: INITIAL_MISSIONS.map(m => ({ ...m, current: 0, completed: false })),
-      userToken: defaultToken
+      userToken: defaultToken,
+      avatar: '🥷',
+      nickname: 'Recruta do Código',
+      lastHeartRegenTime: new Date().toISOString()
     };
 
     const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
@@ -58,6 +61,15 @@ export default function App() {
         // Ensure backward compatibility with older stored state
         if (!parsed.userToken) {
           parsed.userToken = defaultToken;
+        }
+        if (!parsed.avatar) {
+          parsed.avatar = '🥷';
+        }
+        if (!parsed.nickname) {
+          parsed.nickname = 'Recruta do Código';
+        }
+        if (!parsed.lastHeartRegenTime) {
+          parsed.lastHeartRegenTime = new Date().toISOString();
         }
         return parsed;
       } catch (e) {
@@ -117,7 +129,10 @@ export default function App() {
               dailyMissions: mergedMissions,
               completedLessons: cloudData.completedLessons || [],
               unlockedAchievements: cloudData.unlockedAchievements || [],
-              userToken: cloudData.userToken || stats.userToken
+              userToken: cloudData.userToken || stats.userToken,
+              avatar: cloudData.avatar || '🥷',
+              nickname: cloudData.nickname || 'Recruta do Código',
+              lastHeartRegenTime: cloudData.lastHeartRegenTime || new Date().toISOString()
             };
             isCurrentStateFromCloud.current = true;
             setStats(mergedData);
@@ -156,7 +171,10 @@ export default function App() {
                 completedLessons: cloudData.completedLessons || [],
                 unlockedAchievements: cloudData.unlockedAchievements || [],
                 dailyMissions: cloudData.dailyMissions || INITIAL_MISSIONS,
-                userToken: cloudData.userToken || parsed.userToken
+                userToken: cloudData.userToken || parsed.userToken,
+                avatar: cloudData.avatar || '🥷',
+                nickname: cloudData.nickname || 'Recruta do Código',
+                lastHeartRegenTime: cloudData.lastHeartRegenTime || new Date().toISOString()
               });
             }
           } catch (e) {
@@ -176,6 +194,48 @@ export default function App() {
 
     return () => unsubscribe();
   }, []);
+
+  // Passive Heart Regeneration check (adds 1 heart every 1 hour)
+  useEffect(() => {
+    const checkRegen = () => {
+      setStats((prev) => {
+        // If already at cap, keep the checkpoint fresh
+        if (prev.hearts >= prev.maxHearts) {
+          const nowIso = new Date().toISOString();
+          if (prev.lastHeartRegenTime !== nowIso) {
+            return {
+              ...prev,
+              lastHeartRegenTime: nowIso
+            };
+          }
+          return prev;
+        }
+
+        const now = new Date();
+        const lastRegen = prev.lastHeartRegenTime ? new Date(prev.lastHeartRegenTime) : new Date(prev.lastActiveDate || now.toISOString());
+        const diffMs = now.getTime() - lastRegen.getTime();
+        const oneHourMs = 1000 * 60 * 60;
+
+        if (diffMs >= oneHourMs) {
+          const heartsToRegen = Math.floor(diffMs / oneHourMs);
+          const restoredHearts = Math.min(prev.maxHearts, prev.hearts + heartsToRegen);
+          // Only advance lastHeartRegenTime by the exact hours processed, maintaining precision for partial progress
+          const newRegenTime = new Date(lastRegen.getTime() + heartsToRegen * oneHourMs).toISOString();
+
+          return {
+            ...prev,
+            hearts: restoredHearts,
+            lastHeartRegenTime: restoredHearts >= prev.maxHearts ? new Date().toISOString() : newRegenTime
+          };
+        }
+        return prev;
+      });
+    };
+
+    checkRegen(); // Run once on hook mount
+    const interval = setInterval(checkRegen, 10000); // Verify every 10 seconds
+    return () => clearInterval(interval);
+  }, [stats.hearts, stats.maxHearts]);
 
   const loadProgressByToken = async (token: string) => {
     token = token.trim().toUpperCase();
@@ -197,7 +257,10 @@ export default function App() {
           dailyMissions: mergedMissions,
           completedLessons: cloudData.completedLessons || [],
           unlockedAchievements: cloudData.unlockedAchievements || [],
-          userToken: cloudData.userToken || token
+          userToken: cloudData.userToken || token,
+          avatar: cloudData.avatar || '🥷',
+          nickname: cloudData.nickname || 'Recruta do Código',
+          lastHeartRegenTime: cloudData.lastHeartRegenTime || new Date().toISOString()
         };
         isCurrentStateFromCloud.current = true;
         setStats(mergedData);
@@ -394,10 +457,15 @@ export default function App() {
 
   // Process failed attempt (lose single heart)
   const handleCodeFailure = () => {
-    setStats((prev) => ({
-      ...prev,
-      hearts: Math.max(0, prev.hearts - 1)
-    }));
+    setStats((prev) => {
+      const isFull = prev.hearts >= prev.maxHearts;
+      return {
+        ...prev,
+        hearts: Math.max(0, prev.hearts - 1),
+        // Start the hour countdown immediately if they were at full health
+        lastHeartRegenTime: isFull ? new Date().toISOString() : prev.lastHeartRegenTime
+      };
+    });
   };
 
   // Claim Daily Quest Reward
@@ -457,33 +525,6 @@ export default function App() {
       {/* Primary Layout Frame */}
       <div className="max-w-7xl mx-auto space-y-6">
         
-        {/* Banner Announcement */}
-        <div className="flex flex-col md:flex-row items-center justify-between p-4 bg-gradient-to-r from-slate-900 to-indigo-950/60 border border-indigo-500/10 rounded-2xl gap-3">
-          <div className="flex items-center gap-3">
-            <span className="text-2xl p-2 bg-indigo-500/10 text-indigo-400 rounded-xl border border-indigo-500/20">⚔️</span>
-            <div>
-              <h1 className="text-lg font-bold text-white flex items-center gap-1.5 font-sans leading-none">
-                CodeQuest <span className="text-xs text-indigo-400 border border-indigo-500/20 px-2 py-0.5 rounded-full bg-indigo-500/5 font-semibold">Alfa Arena</span>
-              </h1>
-              <p className="text-slate-400 text-xs mt-1">Aprenda HTML, CSS e JavaScript praticando com desafios reais e progressão de RPG!</p>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => {
-                if(window.confirm('Deseja resetar todo o seu progresso? Seus níveis, moedas e conquistas voltarão a zero.')) {
-                  localStorage.removeItem(LOCAL_STORAGE_KEY);
-                  window.location.reload();
-                }
-              }}
-              className="text-[10px] uppercase font-bold text-slate-500 hover:text-rose-400 py-1.5 px-3 rounded border border-slate-850 hover:border-rose-500/20 bg-slate-900 cursor-pointer transition-all"
-            >
-              Resetar Progresso
-            </button>
-          </div>
-        </div>
-
         {/* Global Level Up Pop Notification */}
         {levelUpMessage && (
           <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-gradient-to-r from-amber-500 to-yellow-600 font-extrabold text-[#030712] px-6 py-3.5 rounded-full shadow-2xl flex items-center gap-2 text-sm border-2 border-white animate-bounce">
@@ -504,6 +545,7 @@ export default function App() {
           onSignOut={handleSignOut}
           onLoadToken={loadProgressByToken}
           onResetStats={handleResetStats}
+          onUpdateStats={(updatedFields) => setStats(prev => ({ ...prev, ...updatedFields }))}
         />
 
         {/* Tab display routing switcher */}

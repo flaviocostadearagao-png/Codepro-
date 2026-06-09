@@ -21,7 +21,21 @@ interface HeaderBarProps {
   onSignOut: () => void;
   onLoadToken: (token: string) => void;
   onResetStats: () => void;
+  onUpdateStats?: (newStats: Partial<UserStats>) => void;
 }
+
+const AVAILABLE_RPG_AVATARS = [
+  { emoji: '🥷', label: 'Ninja do Código' },
+  { emoji: '🧙‍♂️', label: 'Alquimista React' },
+  { emoji: '⚔️', label: 'Bárbaro Div' },
+  { emoji: '🐲', label: 'Dragão Divisor' },
+  { emoji: '🦄', label: 'Místico Flexbox' },
+  { emoji: '🤖', label: 'Autômato Dev' },
+  { emoji: '🦊', label: 'Raposa da Api' },
+  { emoji: '🧑‍🚀', label: 'Cosmonauta Git' },
+  { emoji: '🦁', label: 'Líder de Squad' },
+  { emoji: '🦉', label: 'Coruja Sábia' }
+];
 
 export default function HeaderBar({
   stats,
@@ -34,11 +48,62 @@ export default function HeaderBar({
   onSignIn,
   onSignOut,
   onLoadToken,
-  onResetStats
+  onResetStats,
+  onUpdateStats
 }: HeaderBarProps) {
   const [healingFeedback, setHealingFeedback] = useState(false);
   const [copiedFeedback, setCopiedFeedback] = useState(false);
   const [inputToken, setInputToken] = useState('');
+
+  const [showCustomizer, setShowCustomizer] = useState(false);
+  const [tempNickname, setTempNickname] = useState(stats.nickname || 'Recruta do Código');
+  const [countdownText, setCountdownText] = useState('');
+
+  // Keep temporary nickname input state in sync with stats updates (e.g. from Cloud sync load)
+  React.useEffect(() => {
+    if (stats.nickname) {
+      setTempNickname(stats.nickname);
+    }
+  }, [stats.nickname]);
+
+  // Compute countdown timer state for health point regeneration
+  React.useEffect(() => {
+    if (stats.hearts >= stats.maxHearts || !stats.lastHeartRegenTime) {
+      setCountdownText('');
+      return;
+    }
+
+    const updateCountdown = () => {
+      const lastRegen = new Date(stats.lastHeartRegenTime!);
+      const nextRegen = new Date(lastRegen.getTime() + 1000 * 60 * 60); // 1 hour later
+      const diffMs = nextRegen.getTime() - Date.now();
+
+      if (diffMs <= 0) {
+        setCountdownText('Adicionando...');
+      } else {
+        const mins = Math.floor(diffMs / (1000 * 60));
+        const secs = Math.floor((diffMs % (1000 * 60)) / 1000);
+        setCountdownText(`${mins}:${secs < 10 ? '0' : ''}${secs}`);
+      }
+    };
+
+    updateCountdown();
+    const interval = setInterval(updateCountdown, 1000);
+    return () => clearInterval(interval);
+  }, [stats.hearts, stats.maxHearts, stats.lastHeartRegenTime]);
+
+  const handleSelectAvatar = (emoji: string) => {
+    if (onUpdateStats) {
+      onUpdateStats({ avatar: emoji });
+    }
+  };
+
+  const handleSaveProfile = () => {
+    if (onUpdateStats && tempNickname.trim()) {
+      onUpdateStats({ nickname: tempNickname.trim() });
+      setShowCustomizer(false);
+    }
+  };
 
   // Experience threshold for next level: lvl * 300 + 400
   const nextLevelXP = stats.level * 300 + 400;
@@ -98,13 +163,29 @@ export default function HeaderBar({
               Lvl
             </div>
           </div>
-          <div className="flex-1 lg:flex-initial min-w-[200px]">
-            <div className="flex justify-between text-xs font-semibold mb-1">
-              <span className="text-slate-200 flex items-center gap-1">
-                <Sparkles size={12} className="text-amber-400" /> Aventureiro do Código
-              </span>
-              <span className="text-slate-400">{stats.xp} / {nextLevelXP} XP</span>
+          <div className="flex-1 lg:flex-initial min-w-[240px]">
+            <div className="flex flex-col mb-1.5">
+              <div className="flex justify-between items-center text-xs font-semibold mb-0.5">
+                <span className="text-slate-200 flex items-center gap-1.5 hover:text-indigo-400 transition-colors cursor-pointer" onClick={() => setShowCustomizer(!showCustomizer)}>
+                  <span className="text-lg bg-slate-950 p-1 px-1.5 rounded-lg border border-slate-850 leading-none shadow-sm">{stats.avatar || '🥷'}</span>
+                  <span className="font-extrabold text-white text-sm tracking-wide flex items-center gap-1">
+                    {stats.nickname || 'Recruta do Código'}
+                    <span className="text-[10px] text-indigo-400 font-normal opacity-60">✏️</span>
+                  </span>
+                </span>
+                <span className="text-slate-400 text-[10px] font-mono">{stats.xp} / {nextLevelXP} XP</span>
+              </div>
+              
+              <div className="flex items-center justify-between gap-2">
+                <button
+                  onClick={() => setShowCustomizer(!showCustomizer)}
+                  className="text-[9px] text-indigo-400 hover:text-indigo-300 font-bold uppercase tracking-wider flex items-center gap-1 cursor-pointer select-none transition-all active:scale-95"
+                >
+                  ⚔️ Personalizar Herói
+                </button>
+              </div>
             </div>
+
             <div className="w-full bg-slate-950 h-3 rounded-full overflow-hidden border border-slate-800/80 p-0.5">
               <div
                 className="bg-gradient-to-r from-indigo-500 to-purple-500 h-full rounded-full transition-all duration-500 shadow-[0_0_8px_rgba(99,102,241,0.5)]"
@@ -127,19 +208,28 @@ export default function HeaderBar({
           </div>
 
           {/* HEARTS */}
-          <div className="flex items-center gap-3 px-3 py-1.5 bg-slate-950 rounded-xl border border-slate-800 shadow-sm">
-            <div className="flex items-center gap-1">
-              {Array.from({ length: stats.maxHearts }).map((_, i) => (
-                <Heart
-                  key={i}
-                  size={16}
-                  className={`transition-all ${
-                    i < stats.hearts
-                      ? 'fill-rose-500 text-rose-500 scale-100'
-                      : 'text-slate-700 fill-slate-800/50 scale-90'
-                  }`}
-                />
-              ))}
+          <div className="flex flex-col sm:flex-row items-center gap-2.5 px-3 py-1.5 bg-slate-950 rounded-xl border border-slate-800 shadow-sm">
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1">
+                {Array.from({ length: stats.maxHearts }).map((_, i) => (
+                  <Heart
+                    key={i}
+                    size={16}
+                    className={`transition-all ${
+                      i < stats.hearts
+                        ? 'fill-rose-500 text-rose-500 scale-100 animate-pulse'
+                        : 'text-slate-700 fill-slate-800/50 scale-90'
+                    }`}
+                  />
+                ))}
+              </div>
+              
+              {stats.hearts < stats.maxHearts && countdownText && (
+                <div className="flex items-center gap-1 text-[10px] font-bold text-rose-400 bg-rose-500/10 border border-rose-500/20 px-2 py-0.5 rounded-md shadow-sm select-none" title="Tempo restante até recuperar próxima vida">
+                  <span className="animate-ping w-1.5 h-1.5 rounded-full bg-rose-400 shrink-0 inline-block mr-0.5" />
+                  +❤️ em {countdownText}
+                </div>
+              )}
             </div>
             
             {stats.hearts < stats.maxHearts && (
@@ -213,6 +303,62 @@ export default function HeaderBar({
 
         </div>
       </div>
+
+      {/* Profile Customizer Section */}
+      {showCustomizer && (
+        <div className="mt-4 p-4 bg-slate-950/90 rounded-xl border border-slate-850 shadow-inner grid grid-cols-1 md:grid-cols-2 gap-5 animate-scale-in text-xs mb-4">
+          <div className="space-y-3">
+            <label className="block text-[11px] uppercase font-extrabold tracking-wider text-indigo-400">
+              🏷️ Nome do Seu Personagem RPG
+            </label>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                maxLength={20}
+                value={tempNickname}
+                onChange={(e) => setTempNickname(e.target.value)}
+                placeholder="Ex: Nome Heroico..."
+                className="flex-1 p-2 bg-slate-905 border border-slate-800 rounded-lg text-white font-semibold focus:outline-none focus:border-indigo-500 h-10 text-xs"
+              />
+              <button
+                onClick={handleSaveProfile}
+                className="py-2 px-4 bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold rounded-lg uppercase tracking-wider transition-all select-none cursor-pointer h-10 text-xs flex items-center justify-center shrink-0 shadow-lg shadow-indigo-600/10 active:scale-95"
+              >
+                Salvar Nome
+              </button>
+            </div>
+            <p className="text-[10px] text-slate-500 leading-normal">
+              Escolha seu apelido de desenvolvimento e mude quando quiser! O nome será sincronizado em tempo real.
+            </p>
+          </div>
+
+          <div>
+            <label className="block text-[11px] uppercase font-extrabold tracking-wider text-indigo-400 mb-2">
+              🎭 Escolha Seu Avatar Gamificado ({stats.avatar || '🥷'})
+            </label>
+            <div className="grid grid-cols-5 gap-2">
+              {AVAILABLE_RPG_AVATARS.map((av) => {
+                const isSelected = stats.avatar === av.emoji;
+                return (
+                  <button
+                    key={av.emoji}
+                    onClick={() => handleSelectAvatar(av.emoji)}
+                    className={`p-2 py-2.5 rounded-xl text-center flex flex-col items-center justify-center border transition-all cursor-pointer select-none hover:scale-105 active:scale-95 ${
+                      isSelected
+                        ? 'border-indigo-500 bg-indigo-500/20 shadow-md shadow-indigo-500/10 font-bold scale-105'
+                        : 'border-slate-800 bg-slate-900/50 hover:bg-slate-900'
+                    }`}
+                    title={av.label}
+                  >
+                    <span className="text-2xl leading-none mb-1">{av.emoji}</span>
+                    <span className="text-[8px] text-slate-405 font-semibold truncate max-w-full leading-none">{av.label.split(' ')[0]}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* COURSE PROGRESSION CONTROLLER & MILESTONE INDICATORS */}
       <div className="mt-4 p-4 bg-slate-950/80 rounded-xl border border-slate-800/80">
