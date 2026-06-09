@@ -293,19 +293,23 @@ export default function App() {
     // Registered by spendCoins, this callback triggers additional triggers if needed
   };
 
-  // Restore hearts back to full
+  // Restore hearts back to full (or free blessing if completely broke)
   const handleHeal = () => {
-    if (stats.coins < 50) return;
+    const isFreeEmergency = stats.coins < 50 && stats.hearts === 0;
+    if (stats.coins < 50 && !isFreeEmergency) return;
+    
     setStats((prev) => {
+      const cost = isFreeEmergency ? 0 : 50;
       const updatedMissions = prev.dailyMissions.map((m) => {
-        if (m.id === 'm2') {
+        // Only count as spending mission if it was not free
+        if (m.id === 'm2' && cost > 0) {
           return { ...m, current: Math.min(m.target, m.current + 1) };
         }
         return m;
       });
       return {
         ...prev,
-        coins: prev.coins - 50,
+        coins: Math.max(0, prev.coins - cost),
         hearts: prev.maxHearts,
         dailyMissions: updatedMissions
       };

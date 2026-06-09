@@ -194,88 +194,8 @@ export default function MapJourney({ stats, onStartLesson }: MapJourneyProps) {
         })}
       </div>
 
-      {/* RIGHT: Selected Node preview details slot */}
+      {/* RIGHT: Tips & Guidance column */}
       <div className="space-y-6">
-        {selectedLesson ? (
-          <div className="bg-slate-900 border-2 border-indigo-500/30 rounded-2xl p-6 shadow-2xl space-y-4 animate-scale-in text-slate-200">
-            <div className="flex justify-between items-start">
-              <div>
-                <span className="px-2 py-0.5 text-[9px] font-bold bg-indigo-505/10 text-indigo-400 border border-indigo-500/30 rounded-full uppercase tracking-widest">
-                  {selectedLesson.difficulty.toUpperCase()}
-                </span>
-                <h4 className="text-xl font-bold font-sans text-white mt-1.5">{selectedLesson.title}</h4>
-              </div>
-              <button
-                onClick={() => setSelectedLesson(null)}
-                className="text-slate-500 hover:text-slate-300 text-sm font-semibold p-1 bg-slate-950 rounded border border-slate-850 cursor-pointer"
-              >
-                Fechar
-              </button>
-            </div>
-
-            <div className="h-px bg-slate-800 w-full" />
-
-            <div className="space-y-3 text-xs leading-relaxed">
-              <div>
-                <span className="text-[10px] uppercase font-bold text-indigo-400 tracking-wider">Quest Primordial:</span>
-                <p className="text-slate-300 mt-1">{selectedLesson.description}</p>
-              </div>
-
-              <div>
-                <span className="text-[10px] uppercase font-bold text-emerald-400 tracking-wider">O Conceito Secreto:</span>
-                <div className="p-2.5 bg-slate-950 rounded-lg border border-slate-850 mt-1 font-mono text-[11px] text-slate-300 whitespace-pre-line leading-relaxed">
-                  {selectedLesson.concept}
-                </div>
-              </div>
-
-              <div>
-                <span className="text-[10px] uppercase font-bold text-amber-500 tracking-wider">Instruções Práticas:</span>
-                <p className="text-slate-300 font-semibold bg-slate-950 p-2.5 rounded border border-slate-850 border-l-2 border-l-amber-500 mt-1 leading-normal">
-                  {selectedLesson.task}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex gap-4 p-3 bg-slate-950 rounded-xl border border-slate-850 justify-around text-center">
-              <div>
-                <div className="text-[10px] uppercase font-semibold text-slate-400 tracking-wider">XP Recompensa</div>
-                <div className="text-sm font-black text-indigo-400 flex items-center gap-1 justify-center mt-0.5">
-                  <Award size={14} /> +{selectedLesson.xpReward}
-                </div>
-              </div>
-              <div className="w-px bg-slate-800 h-8 self-center" />
-              <div>
-                <div className="text-[10px] uppercase font-semibold text-slate-400 tracking-wider">Moedas</div>
-                <div className="text-sm font-black text-amber-400 flex items-center gap-1 justify-center mt-0.5">
-                  <span>🪙</span> +{selectedLesson.coinsReward}
-                </div>
-              </div>
-            </div>
-
-            <button
-              onClick={() => {
-                onStartLesson(selectedLesson);
-                setSelectedLesson(null);
-              }}
-              className="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-extrabold text-sm uppercase rounded-xl tracking-wider shadow-lg flex items-center justify-center gap-2 transition-all cursor-pointer hover:shadow-emerald-500/10 active:scale-[0.98]"
-            >
-              Iniciar Lição Prática <ChevronRight size={18} />
-            </button>
-          </div>
-        ) : (
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 text-center text-slate-400 shadow-xl py-12 flex flex-col items-center justify-center space-y-4">
-            <div className="w-14 h-14 rounded-full bg-slate-950 flex items-center justify-center text-2xl border border-slate-850">
-              🗺️
-            </div>
-            <div>
-              <h4 className="text-white font-bold text-sm">Nenhum Portal Selecionado</h4>
-              <p className="text-xs text-slate-400 max-w-[200px] mx-auto mt-1">
-                Selecione uma lição desbloqueada no mapa de jornada ao lado para ler os detalhes e abrir o editor.
-              </p>
-            </div>
-          </div>
-        )}
-
         {/* Dynamic Tips panel */}
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl text-xs space-y-3 text-slate-300">
           <h4 className="font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
@@ -287,7 +207,96 @@ export default function MapJourney({ stats, onStartLesson }: MapJourneyProps) {
             <li>Se travar em um desafio avançado, use as dicas 💡 dentro do editor de código. Elas custam apenas 10 Moedas!</li>
           </ul>
         </div>
+
+        {/* Small encouragement badge */}
+        <div className="bg-gradient-to-br from-slate-900 to-indigo-950/40 border border-[#1e293b] rounded-2xl p-5 shadow-xl text-center space-y-3">
+          <div className="w-10 h-10 rounded-full bg-indigo-500/10 text-indigo-400 flex items-center justify-center mx-auto border border-indigo-500/20 text-sm">
+            ✨
+          </div>
+          <p className="text-xs text-slate-400 leading-normal">
+            "O programador paciente forja linhas indestrutíveis." Complete as tarefas passo a passo para se tornar um mestre lendário!
+          </p>
+        </div>
       </div>
+
+      {/* IMMERSIVE CENTERED DIALOG MODAL FOR SELECTED LESSON */}
+      {selectedLesson && (
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 transition-all animate-fade-in">
+          <div className="bg-slate-900 border-2 border-indigo-500/40 rounded-2xl p-6 md:p-8 shadow-2xl space-y-5 max-w-xl w-full animate-scale-in text-slate-200 relative">
+            <div className="flex justify-between items-start">
+              <div>
+                <span className="px-2.5 py-0.5 text-[9px] font-bold bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 rounded-full uppercase tracking-widest font-mono">
+                  MÓDULO: {selectedLesson.difficulty.toUpperCase()}
+                </span>
+                <h4 className="text-xl font-black font-sans text-white mt-2 tracking-wide leading-tight">{selectedLesson.title}</h4>
+              </div>
+              <button
+                onClick={() => setSelectedLesson(null)}
+                className="text-slate-400 hover:text-white text-xs font-bold px-2.5 py-1.5 bg-slate-950 hover:bg-slate-850 rounded-lg border border-slate-800 cursor-pointer transition-all active:scale-95"
+              >
+                Fechar
+              </button>
+            </div>
+
+            <div className="h-px bg-slate-800 w-full" />
+
+            <div className="space-y-4 text-xs leading-relaxed">
+              <div>
+                <span className="text-[10px] uppercase font-bold text-indigo-400 tracking-wider">Quest Primordial:</span>
+                <p className="text-slate-300 mt-1 pl-1">{selectedLesson.description}</p>
+              </div>
+
+              <div>
+                <span className="text-[10px] uppercase font-bold text-emerald-400 tracking-wider">O Conceito Secreto:</span>
+                <div className="p-3 bg-slate-950 rounded-lg border border-slate-850 mt-1 font-mono text-[11px] text-slate-300 whitespace-pre-line leading-relaxed">
+                  {selectedLesson.concept}
+                </div>
+              </div>
+
+              <div>
+                <span className="text-[10px] uppercase font-bold text-amber-500 tracking-wider">Instruções Práticas:</span>
+                <p className="text-slate-200 font-bold bg-amber-500/5 p-3 rounded-lg border border-amber-500/20 border-l-4 border-l-amber-500 mt-1 leading-normal">
+                  {selectedLesson.task}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex gap-4 p-3 bg-slate-950 rounded-xl border border-slate-850 justify-around text-center">
+              <div>
+                <div className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Recompensa</div>
+                <div className="text-sm font-black text-indigo-400 flex items-center gap-1 justify-center mt-0.5">
+                  <Award size={14} /> +{selectedLesson.xpReward} XP
+                </div>
+              </div>
+              <div className="w-px bg-slate-800 h-8 self-center" />
+              <div>
+                <div className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Tesouro</div>
+                <div className="text-sm font-black text-amber-400 flex items-center gap-1 justify-center mt-0.5">
+                  <span>🪙</span> +{selectedLesson.coinsReward} Moedas
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-3 pt-2">
+              <button
+                onClick={() => setSelectedLesson(null)}
+                className="flex-1 py-3 bg-slate-800 hover:bg-slate-750 text-slate-300 font-extrabold text-xs uppercase rounded-xl border border-slate-700 tracking-wider transition-all cursor-pointer active:scale-[0.98]"
+              >
+                Voltar ao Mapa
+              </button>
+              <button
+                onClick={() => {
+                  onStartLesson(selectedLesson);
+                  setSelectedLesson(null);
+                }}
+                className="flex-1 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-black text-xs uppercase rounded-xl tracking-wider shadow-lg flex items-center justify-center gap-2 transition-all cursor-pointer hover:shadow-emerald-500/10 active:scale-[0.98]"
+              >
+                Iniciar Lição <ChevronRight size={14} />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

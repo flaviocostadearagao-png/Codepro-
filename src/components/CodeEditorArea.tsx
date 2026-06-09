@@ -76,7 +76,7 @@ export default function CodeEditorArea({
       const initialTests = activeLesson.tests.map(t => ({ id: t.id, passed: false, checked: false }));
       setTestResults(initialTests);
     }
-  }, [activeLesson, stats.completedLessons]);
+  }, [activeLesson?.id]);
 
   // Handle immediate visual response in iframe (for HTML / CSS preview)
   useEffect(() => {

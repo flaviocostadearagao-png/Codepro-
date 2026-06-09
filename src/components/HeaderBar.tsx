@@ -43,7 +43,7 @@ export default function HeaderBar({
 
   const handleHealClick = () => {
     if (stats.hearts >= stats.maxHearts) return;
-    if (stats.coins < 50) return;
+    if (stats.coins < 50 && stats.hearts > 0) return;
     onHeal();
     setHealingFeedback(true);
     setTimeout(() => {
@@ -122,16 +122,18 @@ export default function HeaderBar({
             {stats.hearts < stats.maxHearts && (
               <button
                 onClick={handleHealClick}
-                disabled={stats.coins < 50}
+                disabled={stats.coins < 50 && stats.hearts > 0}
                 className={`py-1 px-2.5 rounded-lg text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 transition-all cursor-pointer ${
-                  stats.coins >= 50
-                    ? 'bg-rose-500/10 text-rose-400 border border-rose-500/30 hover:bg-rose-500 hover:text-white'
+                  stats.coins >= 50 || stats.hearts === 0
+                    ? 'bg-rose-500/10 text-rose-400 border border-rose-500/30 hover:bg-rose-500 hover:text-white animate-pulse'
                     : 'bg-slate-900 text-slate-500 border border-slate-800 cursor-not-allowed'
                 }`}
-                title="Curar corações por 50 moedas de ouro"
+                title={stats.hearts === 0 && stats.coins < 50 ? "Obter Bênção de Vida Gratuita" : "Curar corações por 50 moedas de ouro"}
               >
                 {healingFeedback ? (
                   <RefreshCw size={10} className="animate-spin text-emerald-400" />
+                ) : stats.hearts === 0 && stats.coins < 50 ? (
+                  '❤️ Bênção (Grátis!)'
                 ) : (
                   '+❤️ (50🪙)'
                 )}
