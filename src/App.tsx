@@ -495,6 +495,7 @@ export default function App() {
               onSpendCoins={handleSpendCoins}
               onBuyHint={handleBuyHint}
               onClose={() => setActiveTab('map')}
+              onSelectLesson={setActiveLesson}
             />
           )}
 

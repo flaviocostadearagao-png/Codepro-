@@ -4,8 +4,9 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Lesson, UserStats, CodeTest, TrackType } from '../types';
-import { Play, RotateCcw, HelpCircle, Eye, Terminal, CheckCircle2, XCircle, ChevronRight, Award, Flame, AlertCircle } from 'lucide-react';
+import { Lesson, UserStats, CodeTest, TrackType, LevelType } from '../types';
+import { Play, RotateCcw, HelpCircle, Eye, Terminal, CheckCircle2, XCircle, ChevronRight, Award, Flame, AlertCircle, ArrowLeft, ArrowRight, Lock, Unlock } from 'lucide-react';
+import { SYLLABUS } from '../data/syllabus';
 
 interface CodeEditorAreaProps {
   stats: UserStats;
@@ -15,6 +16,7 @@ interface CodeEditorAreaProps {
   onSpendCoins: (coins: number) => boolean;
   onBuyHint: () => void;
   onClose: () => void;
+  onSelectLesson: (lesson: Lesson) => void;
 }
 
 export default function CodeEditorArea({
@@ -24,7 +26,8 @@ export default function CodeEditorArea({
   onCodeFailure,
   onSpendCoins,
   onBuyHint,
-  onClose
+  onClose,
+  onSelectLesson
 }: CodeEditorAreaProps) {
   const [code, setCode] = useState('');
   const [hintBought, setHintBought] = useState(false);
@@ -36,6 +39,29 @@ export default function CodeEditorArea({
 
   // Iframe ref for HTML/CSS preview
   const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  // Filter and sort active track lessons
+  const trackLessons = activeLesson ? SYLLABUS.filter((l) => l.track === activeLesson.track) : [];
+  const difficultyOrderObj: Record<LevelType, number> = { iniciante: 1, intermediario: 2, avancado: 3 };
+
+  const sortedLessons = [...trackLessons].sort((a, b) => {
+    if (a.difficulty !== b.difficulty) {
+      return difficultyOrderObj[a.difficulty] - difficultyOrderObj[b.difficulty];
+    }
+    return a.order - b.order;
+  });
+
+  const isLessonUnlocked = (lesson: Lesson) => {
+    const idx = sortedLessons.findIndex((l) => l.id === lesson.id);
+    if (idx === 0) return true;
+    const prevLesson = sortedLessons[idx - 1];
+    return stats.completedLessons.includes(prevLesson.id);
+  };
+
+  const currentIdx = activeLesson ? sortedLessons.findIndex((l) => l.id === activeLesson.id) : -1;
+  const prevLesson = currentIdx > 0 ? sortedLessons[currentIdx - 1] : null;
+  const nextLesson = currentIdx !== -1 && currentIdx < sortedLessons.length - 1 ? sortedLessons[currentIdx + 1] : null;
+  const isNextLessonUnlocked = nextLesson ? isLessonUnlocked(nextLesson) : false;
 
   // Load lesson code
   useEffect(() => {
@@ -111,16 +137,104 @@ export default function CodeEditorArea({
   }, [code, activeLesson]);
 
   if (!activeLesson) {
+    const trackLessons = SYLLABUS.filter((l) => l.track === stats.activeTrack);
+    const difficultyOrderObj: Record<LevelType, number> = { iniciante: 1, intermediario: 2, avancado: 3 };
+
+    const sortedLessons = [...trackLessons].sort((a, b) => {
+      if (a.difficulty !== b.difficulty) {
+        return difficultyOrderObj[a.difficulty] - difficultyOrderObj[b.difficulty];
+      }
+      return a.order - b.order;
+    });
+
+    const isUnlocked = (lesson: Lesson) => {
+      const idx = sortedLessons.findIndex((l) => l.id === lesson.id);
+      if (idx === 0) return true;
+      const prevLesson = sortedLessons[idx - 1];
+      return stats.completedLessons.includes(prevLesson.id);
+    };
+
     return (
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-12 text-center text-slate-400 shadow-xl max-w-lg mx-auto my-12 space-y-4">
-        <div className="w-16 h-16 rounded-full bg-slate-950 flex items-center justify-center text-3xl border border-slate-850 mx-auto">
-          💻
-        </div>
-        <div>
-          <h3 className="text-white font-extrabold text-lg">Selecione uma Lição no Mapa</h3>
-          <p className="text-xs mt-1.5">
-            Volte para a aba <strong>🗺️ Jornada Map</strong>, selecione um nó desbloqueado no mapa e clique em iniciar lição para desbloquear o console de desenvolvimento.
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 md:p-8 shadow-2xl max-w-4xl mx-auto my-6 space-y-6 animate-scale-in text-slate-200">
+        <div className="text-center space-y-2 border-b border-slate-800 pb-6">
+          <div className="w-16 h-16 rounded-full bg-slate-950 flex items-center justify-center text-3xl border border-slate-850 mx-auto">
+            💻
+          </div>
+          <h3 className="text-white font-extrabold text-xl font-sans uppercase tracking-wider">Centro de Treinamento e Prática</h3>
+          <p className="text-xs text-slate-400 max-w-xl mx-auto">
+            Escolha qualquer lição prática desbloqueada na trilha de <strong className="text-indigo-400">{stats.activeTrack.toUpperCase()}</strong> abaixo para carregar as instruções e o editor de código interativo ao vivo.
           </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[420px] overflow-y-auto pr-2">
+          {sortedLessons.map((lesson, idx) => {
+            const unlocked = isUnlocked(lesson);
+            const completed = stats.completedLessons.includes(lesson.id);
+
+            return (
+              <div
+                key={lesson.id}
+                className={`p-4 rounded-xl border transition-all flex flex-col justify-between ${
+                  completed
+                    ? 'bg-emerald-500/5 border-emerald-500/20 hover:border-emerald-500/40'
+                    : unlocked
+                    ? 'bg-slate-950 border-slate-850/80 hover:border-indigo-500/40'
+                    : 'bg-slate-950/40 border-slate-900 opacity-55 text-slate-500 select-none'
+                }`}
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[10px] uppercase font-mono bg-slate-900/80 px-2 py-0.5 rounded text-indigo-400 font-extrabold tracking-wider border border-slate-800">
+                      Nível {idx + 1} • {lesson.difficulty}
+                    </span>
+                    {completed ? (
+                      <span className="text-[10px] font-bold text-emerald-400 flex items-center gap-1 bg-emerald-500/10 px-2 py-0.5 rounded">
+                        ✓ Concluída
+                      </span>
+                    ) : unlocked ? (
+                      <span className="text-[10px] font-bold text-amber-500 flex items-center gap-1 bg-amber-500/10 px-2 py-0.5 rounded">
+                        ⚔️ Disponível
+                      </span>
+                    ) : (
+                      <span className="text-[10px] font-bold text-slate-600 flex items-center gap-1 bg-slate-900 px-2 py-0.5 rounded">
+                        <Lock size={10} /> Bloqueada
+                      </span>
+                    )}
+                  </div>
+                  <h4 className="text-sm font-bold text-white leading-snug">{lesson.title}</h4>
+                  <p className="text-slate-400 text-[11px] mt-1 line-clamp-2 leading-relaxed">{lesson.description}</p>
+                </div>
+
+                <div className="flex items-center justify-between mt-4 pt-3 border-t border-slate-800/60 text-[11px]">
+                  <div className="flex items-center gap-3 text-slate-400 font-medium">
+                    <span className="text-indigo-400">+{lesson.xpReward} XP</span>
+                    <span>•</span>
+                    <span className="text-amber-400">{lesson.coinsReward}🪙</span>
+                  </div>
+
+                  {unlocked || completed ? (
+                    <button
+                      onClick={() => onSelectLesson(lesson)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1 ${
+                        completed
+                          ? 'bg-emerald-500/10 hover:bg-emerald-500 hover:text-white text-emerald-400 border border-emerald-500/20'
+                          : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow shadow-indigo-500/20'
+                      }`}
+                    >
+                      {completed ? 'Rejogar' : 'Iniciar'} <ChevronRight size={12} />
+                    </button>
+                  ) : (
+                    <button
+                      disabled
+                      className="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-900 text-slate-600 border border-slate-850/60 cursor-not-allowed flex items-center gap-1"
+                    >
+                      <Lock size={12} /> Bloqueada
+                    </button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     );
@@ -418,19 +532,75 @@ export default function CodeEditorArea({
       {/* 1. LEFT SIDEBAR: Instructions & Theory & Tests */}
       <div className="xl:col-span-4 bg-slate-900 border border-slate-800 rounded-xl p-5 flex flex-col justify-between h-[600px] overflow-y-auto">
         <div className="space-y-4">
-          <div className="flex justify-between items-start">
+          <div className="space-y-3 bg-slate-950 p-3 rounded-xl border border-slate-850">
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-[9px] uppercase font-bold text-indigo-400 tracking-wider">Desafios</span>
+              <button
+                onClick={onClose}
+                className="text-[9px] py-1 px-2.5 rounded bg-slate-900 hover:bg-slate-800 text-slate-400 font-bold border border-slate-800 cursor-pointer transition-all uppercase"
+              >
+                Voltar ao Mapa
+              </button>
+            </div>
+            
+            {/* Dropdown Selector */}
+            <select
+              value={activeLesson.id}
+              onChange={(e) => {
+                const selected = sortedLessons.find(l => l.id === e.target.value);
+                if (selected) onSelectLesson(selected);
+              }}
+              className="w-full bg-slate-900 text-stone-105 font-extrabold text-[11px] p-2 rounded-lg border border-slate-800 focus:outline-none focus:border-indigo-500 cursor-pointer"
+            >
+              {sortedLessons.map((l, i) => {
+                const unlocked = isLessonUnlocked(l);
+                const completed = stats.completedLessons.includes(l.id);
+                const prefix = completed ? '✅' : unlocked ? '⚔️' : '🔒';
+                return (
+                  <option key={l.id} value={l.id} disabled={!unlocked && !completed}>
+                    {prefix} Nível {i + 1}: {l.title}
+                  </option>
+                );
+              })}
+            </select>
+
+            {/* Quick Prev / Next Buttons */}
+            <div className="flex items-center gap-2 justify-between">
+              <button
+                onClick={() => prevLesson && onSelectLesson(prevLesson)}
+                disabled={!prevLesson}
+                className={`flex-1 py-1 px-2 rounded text-[10px] font-bold uppercase flex items-center justify-center gap-1 border transition-all ${
+                  prevLesson
+                    ? 'bg-slate-900 border-slate-800 text-slate-300 hover:bg-slate-805 cursor-pointer'
+                    : 'bg-slate-950/20 border-slate-900/40 text-slate-600 cursor-not-allowed'
+                }`}
+                title="Ir para o desafio anterior"
+              >
+                <ArrowLeft size={10} /> Anterior
+              </button>
+              
+              <button
+                onClick={() => nextLesson && onSelectLesson(nextLesson)}
+                disabled={!nextLesson || (!isNextLessonUnlocked && !stats.completedLessons.includes(activeLesson.id))}
+                className={`flex-1 py-1 px-2 rounded text-[10px] font-bold uppercase flex items-center justify-center gap-1 border transition-all ${
+                  nextLesson && (isNextLessonUnlocked || stats.completedLessons.includes(activeLesson.id))
+                    ? 'bg-slate-900 border-slate-800 text-slate-300 hover:bg-slate-805 cursor-pointer'
+                    : 'bg-slate-950/20 border-slate-900/40 text-slate-650 cursor-not-allowed'
+                }`}
+                title="Avançar para o próximo desafio liberado"
+              >
+                Próximo <ArrowRight size={10} />
+              </button>
+            </div>
+          </div>
+
+          <div className="flex justify-between items-start pt-1">
             <div>
-              <span className="px-2.5 py-0.5 rounded-full bg-slate-950 text-slate-400 border border-slate-800 uppercase font-black text-[9px] tracking-widest">
+              <span className="px-2 py-0.5 rounded-full bg-slate-950 text-slate-450 border border-slate-850 uppercase font-black text-[9px] tracking-widest leading-none">
                 {activeLesson.track.toUpperCase()} • {activeLesson.difficulty.toUpperCase()}
               </span>
-              <h3 className="text-lg font-bold text-white mt-1.5">{activeLesson.title}</h3>
+              <h3 className="text-base font-bold text-white mt-1.5 leading-snug">{activeLesson.title}</h3>
             </div>
-            <button
-              onClick={onClose}
-              className="text-xs px-2 py-1 rounded bg-slate-950 hover:bg-slate-800 text-slate-400 font-bold border border-slate-850 cursor-pointer"
-            >
-              Voltar ao Mapa
-            </button>
           </div>
 
           <div className="h-px bg-slate-800" />
@@ -682,15 +852,33 @@ export default function CodeEditorArea({
               "Excelente escrita estrutural! Seus seletores e lógicas estão limpos. A internet precisa de programadores com a sua precisão."
             </div>
 
-            <button
-              onClick={() => {
-                setSuccessMode(false);
-                onClose(); // Switch back to map
-              }}
-              className="w-full py-3 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white font-extrabold text-xs uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 shadow-lg transition-all duration-300 transform hover:scale-[1.01] active:scale-[0.98] cursor-pointer"
-            >
-              Reivindicar Prêmios & Continuar <ChevronRight size={14} />
-            </button>
+            <div className="flex flex-col gap-2.5">
+              {nextLesson && (
+                <button
+                  onClick={() => {
+                    setSuccessMode(false);
+                    onSelectLesson(nextLesson);
+                  }}
+                  className="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-extrabold text-xs uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 shadow-lg transition-all duration-300 transform hover:scale-[1.01] active:scale-[0.98] cursor-pointer"
+                >
+                  Ir para Próxima Lição <ArrowRight size={14} />
+                </button>
+              )}
+              
+              <button
+                onClick={() => {
+                  setSuccessMode(false);
+                  onClose(); // Switch back to map
+                }}
+                className={`w-full py-3 text-white font-extrabold text-xs uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 transition-all duration-300 transform hover:scale-[1.01] active:scale-[0.98] cursor-pointer ${
+                  nextLesson 
+                    ? 'bg-slate-800 hover:bg-slate-750 hover:text-slate-100 border border-slate-700' 
+                    : 'bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 shadow-lg'
+                }`}
+              >
+                {nextLesson ? 'Ver no Mapa da Jornada' : 'Reivindicar Prêmios & Continuar'} <ChevronRight size={14} />
+              </button>
+            </div>
           </div>
         </div>
       )}
