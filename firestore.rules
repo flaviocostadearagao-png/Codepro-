@@ -33,8 +33,8 @@ service cloud.firestore {
       return data.keys().hasAll([
         'xp', 'level', 'hearts', 'maxHearts', 'coins', 'streak', 
         'lastActiveDate', 'completedLessons', 'unlockedAchievements', 
-        'activeTrack', 'dailyMissions'
-      ]) && data.keys().size() == 11
+        'activeTrack', 'dailyMissions', 'userToken'
+      ]) && data.keys().size() == 12
          && data.xp is int && data.xp >= 0
          && data.level is int && data.level >= 1
          && data.hearts is int && data.hearts >= 0
@@ -45,29 +45,27 @@ service cloud.firestore {
          && data.completedLessons is list && data.completedLessons.size() <= 500
          && data.unlockedAchievements is list && data.unlockedAchievements.size() <= 50
          && data.activeTrack is string && (data.activeTrack == 'html' || data.activeTrack == 'css' || data.activeTrack == 'js')
-         && data.dailyMissions is list && data.dailyMissions.size() <= 10;
+         && data.dailyMissions is list && data.dailyMissions.size() <= 10
+         && data.userToken is string && data.userToken.size() <= 128;
     }
 
     // Section for player accounts - only owner can access and modify their own record
     match /users/{userId} {
-      allow get: if isSignedIn() && userId == request.auth.uid;
+      allow get: if (isSignedIn() && userId == request.auth.uid)
+                    || (userId.startsWith('CQ-') && isValidId(userId));
       
-      allow create: if isSignedIn() 
-                    && isEmailVerified()
-                    && isValidId(userId) 
-                    && userId == request.auth.uid 
-                    && isValidUser(incoming());
+      allow create: if (
+                      (isSignedIn() && isEmailVerified() && userId == request.auth.uid)
+                      || (userId.startsWith('CQ-') && isValidId(userId))
+                    ) && isValidUser(incoming());
                     
-      allow update: if isSignedIn() 
-                    && isEmailVerified()
-                    && isValidId(userId) 
-                    && userId == request.auth.uid 
-                    && isValidUser(incoming());
+      allow update: if (
+                      (isSignedIn() && isEmailVerified() && userId == request.auth.uid)
+                      || (userId.startsWith('CQ-') && isValidId(userId))
+                    ) && isValidUser(incoming());
                     
-      allow delete: if isSignedIn() 
-                    && isEmailVerified()
-                    && isValidId(userId) 
-                    && userId == request.auth.uid;
+      allow delete: if (isSignedIn() && isEmailVerified() && userId == request.auth.uid)
+                    || (userId.startsWith('CQ-') && isValidId(userId));
     }
   }
 }

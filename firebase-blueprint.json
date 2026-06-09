@@ -15,9 +15,10 @@
         "completedLessons": { "type": "array", "description": "List of completed lesson IDs" },
         "unlockedAchievements": { "type": "array", "description": "List of unlocked achievement IDs" },
         "activeTrack": { "type": "string", "enum": ["html", "css", "js"], "description": "Currently active learning track" },
-        "dailyMissions": { "type": "array", "description": "List of active daily missions" }
+        "dailyMissions": { "type": "array", "description": "List of active daily missions" },
+        "userToken": { "type": "string", "description": "Unique access token for automatic cloud saving" }
       },
-      "required": ["xp", "level", "hearts", "maxHearts", "coins", "streak", "lastActiveDate", "completedLessons", "unlockedAchievements", "activeTrack", "dailyMissions"]
+      "required": ["xp", "level", "hearts", "maxHearts", "coins", "streak", "lastActiveDate", "completedLessons", "unlockedAchievements", "activeTrack", "dailyMissions", "userToken"]
     }
   },
   "firestore": {

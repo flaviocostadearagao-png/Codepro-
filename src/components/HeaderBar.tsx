@@ -18,6 +18,7 @@ interface HeaderBarProps {
   authLoading: boolean;
   onSignIn: () => void;
   onSignOut: () => void;
+  onLoadToken: (token: string) => void;
 }
 
 export default function HeaderBar({
@@ -29,9 +30,12 @@ export default function HeaderBar({
   user,
   authLoading,
   onSignIn,
-  onSignOut
+  onSignOut,
+  onLoadToken
 }: HeaderBarProps) {
   const [healingFeedback, setHealingFeedback] = useState(false);
+  const [copiedFeedback, setCopiedFeedback] = useState(false);
+  const [inputToken, setInputToken] = useState('');
 
   // Experience threshold for next level: lvl * 300 + 400
   const nextLevelXP = stats.level * 300 + 400;
@@ -182,6 +186,54 @@ export default function HeaderBar({
             )}
           </div>
 
+        </div>
+      </div>
+
+      {/* UNIQUE USER TOKEN & AUTOMATIC SAVE STATUS BAR */}
+      <div className="mt-4 p-3 bg-slate-950 rounded-xl border border-slate-800/80 flex flex-col md:flex-row items-center justify-between gap-3 text-xs">
+        <div className="flex flex-wrap items-center gap-2 text-slate-300">
+          <span className="font-bold text-amber-400">🔑 Token de Progresso Único:</span>
+          <span className="font-mono bg-slate-900 border border-slate-800 px-2 py-0.5 rounded text-white font-extrabold select-all tracking-wider text-[11px]">
+            {stats.userToken || 'Gerando...'}
+          </span>
+          <button
+            onClick={() => {
+              if (stats.userToken) {
+                navigator.clipboard.writeText(stats.userToken);
+                setCopiedFeedback(true);
+                setTimeout(() => setCopiedFeedback(false), 2000);
+              }
+            }}
+            className="p-1 px-2.5 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 select-none hover:text-indigo-300 rounded border border-indigo-500/20 text-[10px] font-bold uppercase cursor-pointer transition-all active:scale-95"
+          >
+            {copiedFeedback ? 'Copiado! ✅' : 'Copiar'}
+          </button>
+          <span className="text-[10px] text-emerald-400 font-semibold flex items-center gap-1 ml-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+            Progresso Salvo Automaticamente na Nuvem ☁️
+          </span>
+        </div>
+
+        {/* Load backup token form */}
+        <div className="flex items-center gap-1.5 w-full md:w-auto">
+          <input
+            type="text"
+            placeholder="Carregar Token (ex: CQ-XXXXXX)"
+            value={inputToken}
+            onChange={(e) => setInputToken(e.target.value)}
+            className="p-1 px-2.5 text-[10px] font-mono rounded bg-slate-900 border border-slate-800 text-slate-200 placeholder-slate-500 uppercase tracking-widest focus:outline-none focus:border-indigo-500 w-full md:w-48 h-8"
+          />
+          <button
+            onClick={() => {
+              if (inputToken.trim()) {
+                onLoadToken(inputToken);
+                setInputToken('');
+              }
+            }}
+            className="p-1 px-3 bg-slate-800 hover:bg-slate-755 text-white rounded text-[10px] font-bold uppercase border border-slate-700 cursor-pointer transition-all active:scale-95 shrink-0 h-8"
+          >
+            Carregar
+          </button>
         </div>
       </div>
 

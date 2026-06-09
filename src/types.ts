@@ -74,4 +74,5 @@ export interface UserStats {
   unlockedAchievements: string[]; // List of achievement IDs
   activeTrack: TrackType;
   dailyMissions: DailyMission[];
+  userToken: string;
 }

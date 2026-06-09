@@ -20,22 +20,19 @@ import { auth, db, googleProvider, handleFirestoreError, OperationType } from '.
 
 const LOCAL_STORAGE_KEY = 'codequest_user_stats_v2';
 
+const generateUserToken = (): string => {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let result = 'CQ-';
+  for (let i = 0; i < 8; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+};
+
 export default function App() {
   const [stats, setStats] = useState<UserStats>(() => {
-    const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        // Ensure missions array structure exists
-        if (!parsed.dailyMissions || parsed.dailyMissions.length === 0) {
-          parsed.dailyMissions = INITIAL_MISSIONS;
-        }
-        return parsed;
-      } catch (e) {
-        // use default if parse fails
-      }
-    }
-    return {
+    const defaultToken = generateUserToken();
+    const defaultStats: UserStats = {
       xp: 120,
       level: 1,
       hearts: 5,
@@ -46,8 +43,28 @@ export default function App() {
       completedLessons: [],
       unlockedAchievements: [],
       activeTrack: 'html',
-      dailyMissions: INITIAL_MISSIONS
+      dailyMissions: INITIAL_MISSIONS,
+      userToken: defaultToken
     };
+
+    const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        // Ensure missions array structure exists
+        if (!parsed.dailyMissions || parsed.dailyMissions.length === 0) {
+          parsed.dailyMissions = INITIAL_MISSIONS;
+        }
+        // Ensure backward compatibility with older stored state
+        if (!parsed.userToken) {
+          parsed.userToken = defaultToken;
+        }
+        return parsed;
+      } catch (e) {
+        // use default if parse fails
+      }
+    }
+    return defaultStats;
   });
 
   const [activeTab, setActiveTab ] = useState<'map' | 'editor' | 'leaderboard' | 'gdd'>('map');
@@ -59,24 +76,26 @@ export default function App() {
   const [authLoading, setAuthLoading] = useState(true);
   const isCurrentStateFromCloud = useRef(false);
 
-  // Sync state changes to matching repository (localStorage fallback OR cloud Firestore)
+  // Sync state changes to matching repository (localStorage fallback AND cloud Firestore)
   useEffect(() => {
-    if (!user) {
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(stats));
-      return;
-    }
+    // Local copy is always updated as a safe fallback
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(stats));
 
     if (isCurrentStateFromCloud.current) {
       isCurrentStateFromCloud.current = false;
       return; // prevent rewriting exact data just pulled from Firestore
     }
 
-    // Write player stats strictly to Firestore
-    const userDocRef = doc(db, 'users', user.uid);
-    setDoc(userDocRef, stats)
-      .catch((error) => {
-        handleFirestoreError(error, OperationType.WRITE, `users/${user.uid}`);
-      });
+    // Determine path ID to write to based on login state (Google UID or unique Guest token)
+    const activeDocId = user ? user.uid : stats.userToken;
+
+    if (activeDocId) {
+      const userDocRef = doc(db, 'users', activeDocId);
+      setDoc(userDocRef, stats)
+        .catch((error) => {
+          handleFirestoreError(error, OperationType.WRITE, `users/${activeDocId}`);
+        });
+    }
   }, [stats, user]);
 
   // Handle Firebase auth validation transitions
@@ -97,7 +116,8 @@ export default function App() {
               ...cloudData,
               dailyMissions: mergedMissions,
               completedLessons: cloudData.completedLessons || [],
-              unlockedAchievements: cloudData.unlockedAchievements || []
+              unlockedAchievements: cloudData.unlockedAchievements || [],
+              userToken: cloudData.userToken || stats.userToken
             };
             isCurrentStateFromCloud.current = true;
             setStats(mergedData);
@@ -120,8 +140,35 @@ export default function App() {
             if (!parsed.dailyMissions || parsed.dailyMissions.length === 0) {
               parsed.dailyMissions = INITIAL_MISSIONS;
             }
+            if (!parsed.userToken) {
+              parsed.userToken = generateUserToken();
+            }
             setStats(parsed);
-          } catch (e) {}
+
+            // Fetch latest guest cloud save if exists!
+            const userDocRef = doc(db, 'users', parsed.userToken);
+            const docSnap = await getDoc(userDocRef);
+            if (docSnap.exists()) {
+              const cloudData = docSnap.data() as UserStats;
+              isCurrentStateFromCloud.current = true;
+              setStats({
+                ...cloudData,
+                completedLessons: cloudData.completedLessons || [],
+                unlockedAchievements: cloudData.unlockedAchievements || [],
+                dailyMissions: cloudData.dailyMissions || INITIAL_MISSIONS,
+                userToken: cloudData.userToken || parsed.userToken
+              });
+            }
+          } catch (e) {
+            console.error('Error fetching guest data:', e);
+          }
+        } else {
+          // completely fresh guest
+          const defaultToken = generateUserToken();
+          setStats((prev) => ({
+            ...prev,
+            userToken: defaultToken
+          }));
         }
         setAuthLoading(false);
       }
@@ -129,6 +176,43 @@ export default function App() {
 
     return () => unsubscribe();
   }, []);
+
+  const loadProgressByToken = async (token: string) => {
+    token = token.trim().toUpperCase();
+    if (!token.startsWith('CQ-') || token.length < 5) {
+      alert('Token inválido. O token deve começar com "CQ-"');
+      return;
+    }
+
+    setAuthLoading(true);
+    try {
+      const userDocRef = doc(db, 'users', token);
+      const docSnap = await getDoc(userDocRef);
+
+      if (docSnap.exists()) {
+        const cloudData = docSnap.data() as UserStats;
+        const mergedMissions = cloudData.dailyMissions || INITIAL_MISSIONS;
+        const mergedData: UserStats = {
+          ...cloudData,
+          dailyMissions: mergedMissions,
+          completedLessons: cloudData.completedLessons || [],
+          unlockedAchievements: cloudData.unlockedAchievements || [],
+          userToken: cloudData.userToken || token
+        };
+        isCurrentStateFromCloud.current = true;
+        setStats(mergedData);
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(mergedData));
+        alert('Progresso recuperado com sucesso da nuvem! ☁️');
+      } else {
+        alert('Nenhum cadastro encontrado na nuvem para este token de progressão.');
+      }
+    } catch (error) {
+      console.error('Erro ao buscar token:', error);
+      alert('Falha ao carregar progresso da nuvem. Verifique o seu console.');
+    } finally {
+      setAuthLoading(false);
+    }
+  };
 
   const handleSignIn = async () => {
     try {
@@ -390,6 +474,7 @@ export default function App() {
           authLoading={authLoading}
           onSignIn={handleSignIn}
           onSignOut={handleSignOut}
+          onLoadToken={loadProgressByToken}
         />
 
         {/* Tab display routing switcher */}
