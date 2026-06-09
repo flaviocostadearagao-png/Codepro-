@@ -1327,6 +1327,318 @@ export const SYLLABUS: Lesson[] = [
     coinsReward: 60,
     xpReward: 350,
     order: 19
+  },
+  {
+    id: 'html_ini_7',
+    title: 'HTML Semântico: Seções de Conteúdo Estruturadas',
+    description: 'Conecte o leitor à estrutura interna de uma página! Aprenda a agrupar partes cruciais de um documento com tags dedicadas em vez de usar divs unônimas puras.',
+    concept: 'Tags semânticas como `<header>`, `<main>` e `<footer>` informam o conteúdo exato que carregam aos leitores de tela e motores de busca, melhorando sensivelmente o SEO e a acessibilidade global.',
+    track: 'html',
+    difficulty: 'iniciante',
+    task: 'Crie as seções semânticas básicas de uma página de aventura. Declare uma tag `<header>` que envolva um elemento `<h1>` com o texto "Título Principal". Logo abaixo do header (totalmente fora dele), crie a tag `<main></main>` para acomodar o conteúdo principal e, por fim, declare um `<footer>` (fora do main) contendo o texto "Rodapé".',
+    initialCode: '<!-- Declare o esqueleto semântico da página abaixo -->\n',
+    solutionExample: '<header>\n  <h1>Título Principal</h1>\n</header>\n<main></main>\n<footer>\n  Rodapé\n</footer>',
+    tests: [
+      { id: 't1', description: 'Deve conter a tag <header> envolvendo um título <h1> com texto "Título Principal"', ruleType: 'regex', expected: '<header>[\\s\\S]*<h1>Título Principal<\\/h1>[\\s\\S]*<\\/header>' },
+      { id: 't2', description: 'Deve possuir o elemento semântico principal <main></main> fora do header', ruleType: 'regex', expected: '<\\/header>[\\s\\S]*<main>\\s*<\\/main>' },
+      { id: 't3', description: 'Deve possuir a tag semântica <footer>contendo Rodapé no encerramento', ruleType: 'regex', expected: '<\\/main>[\\s\\S]*<footer>[\\s\\S]*Rodapé[\\s\\S]*<\\/footer>' }
+    ],
+    hint: 'Assegure que as tags estão perfeitamente aninhadas e fechadas na ordem descrita.',
+    coinsReward: 40,
+    xpReward: 200,
+    order: 7
+  },
+  {
+    id: 'html_int_9',
+    title: 'HTML Acessível: Associação de Labels e Inputs',
+    description: 'Formulários acessíveis começam com o direcionamento preciso de leitores de tela. Associe rótulos aos seus elementos de entrada de forma explícita!',
+    concept: 'Usar a propriedade `for` no elemento `<label>` vinculando-a ao atributo `id` de um `<input>` garante que cliques na legenda foquem automaticamente no campo, além de guiar leitores assistivos perfeitamente.',
+    track: 'html',
+    difficulty: 'intermediario',
+    task: 'Desenvolva um campo de e-mail acessível para novos aventureiros. Crie um elemento `<label>` com o atributo `for="email-usuario"` contendo o texto "E-mail:". Logo em seguida, crie um elemento `<input>` do tipo e-mail (`type="email"`) carregando o atributo de identificação `id="email-usuario"`.',
+    initialCode: '<!-- Monte o campo de e-mail integrado e acessível -->\n',
+    solutionExample: '<label for="email-usuario">E-mail:</label>\n<input type="email" id="email-usuario" />',
+    tests: [
+      { id: 't1', description: 'Deve possuir a tag <label> com atributo for configurado para "email-usuario"', ruleType: 'regex', expected: '<label[^>]*for="email-usuario"[^>]*>' },
+      { id: 't2', description: 'Deve existir um <input> com id definido exatamente como "email-usuario"', ruleType: 'regex', expected: '<input[^>]*id="email-usuario"[^>]*>|<input[^>]*id=\'email-usuario\'[^>]*>' },
+      { id: 't3', description: 'O tipo (type) do input deve ser configurado como "email"', ruleType: 'regex', expected: 'type="email"|type=\'email\'' }
+    ],
+    hint: 'Escreva a tag <label for="email-usuario">E-mail:</label> e imediatamente depois adicione <input type="email" id="email-usuario" />.',
+    coinsReward: 50,
+    xpReward: 250,
+    order: 14
+  },
+  {
+    id: 'css_ini_9',
+    title: 'CSS Variables (Propriedades Customizadas)',
+    description: 'Simplifique a manutenção de cores e temas no seu projeto utilizando variáveis customizadas, facilitando mudanças globais em segundos como nos grandes builds profissionais!',
+    concept: 'Declaramos variáveis com dois traços (`--nome-variavel`) dentro dos seletores CSS, e as invocamos usando a função nativa `var(--nome-variavel)`.',
+    track: 'css',
+    difficulty: 'iniciante',
+    task: 'Redefina a paleta de cores de um card. Na classe `.cartao-tematico`:\n1. Declare uma variável customizada de cor chamada `--cor-sucesso` com o valor hexadecimal `#2ecc71`.\n2. Defina a propriedade `border-color` utilizando a função `var()` passando a variável `--cor-sucesso` recém-criada.',
+    initialCode: '.cartao-tematico {\n  /* Declare e consuma a variável local de cor */\n  \n}',
+    solutionExample: '.cartao-tematico {\n  --cor-sucesso: #2ecc71;\n  border-color: var(--cor-sucesso);\n}',
+    tests: [
+      { id: 't1', description: 'Deve possuir a declaração da variável --cor-sucesso com valor hexadecimal #2ecc71', ruleType: 'regex', expected: '--cor-sucesso\\s*:\\s*#2ecc71' },
+      { id: 't2', description: 'A propriedade border-color deve ser definida por var(--cor-sucesso)', ruleType: 'regex', expected: 'border-color\\s*:\\s*var\\(\\s*--cor-sucesso\\s*\\)' }
+    ],
+    hint: 'Configure o seletor declarando as propriedades na mesma classe.',
+    coinsReward: 40,
+    xpReward: 200,
+    order: 7
+  },
+  {
+    id: 'css_adv_9',
+    title: 'CSS Grid: Áreas Visuais Dinâmicas',
+    description: 'Pare de misturar floats e margens erráticas para erguer colunas complexas de sites! Domine a fantástica propriedade Grid-Template-Areas para mapear layouts de forma visual e literal.',
+    concept: 'A propriedade `grid-template-areas` nos permite desenhar o esquema de exibição escrevendo strings de nomes de áreas. Associamos elementos filhos a essas áreas utilizando a propriedade `grid-area`.',
+    track: 'css',
+    difficulty: 'avancado',
+    task: 'Forje um painel de faturamento em grade. Complete as classes CSS do contêiner e dos itens:\n1. Na regra `.conteiner-grade`, ative o layout com `display: grid;` e estabeleça as áreas com `grid-template-areas: "topo topo" "lateral principal";`.\n2. Na regra `.item-topo`, associe a área topo aplicando o comando `grid-area: topo;`.',
+    initialCode: '.conteiner-grade {\n  \n}\n\n.item-topo {\n  \n}',
+    solutionExample: '.conteiner-grade {\n  display: grid;\n  grid-template-areas: "topo topo" "lateral principal";\n}\n.item-topo {\n  grid-area: topo;\n}',
+    tests: [
+      { id: 't1', description: 'O conteiner .conteiner-grade deve de fato possuir display: grid;', ruleType: 'regex', expected: 'display\\s*:\\s*grid' },
+      { id: 't2', description: 'O conteiner deve ter grid-template-areas definindo "topo topo" e "lateral principal"', ruleType: 'regex', expected: 'grid-template-areas\\s*:\\s*["\']topo topo["\']\\s+["\']lateral principal["\']' },
+      { id: 't3', description: 'A classe .item-topo deve possuir o mapeamento de área grid-area: topo;', ruleType: 'regex', expected: 'grid-area\\s*:\\s*topo' }
+    ],
+    hint: 'Use a sintaxe exata para grid-template-areas com as aspas duplas idênticas ao enunciado e defina grid-area: topo; no filho.',
+    coinsReward: 60,
+    xpReward: 350,
+    order: 19
+  },
+  {
+    id: 'js_ini_8',
+    title: 'JavaScript Moderno: Encadeamento Opcional (Optional Chaining)',
+    description: 'Evite o infame erro "Cannot read properties of undefined" e salve sua aplicação de crashar de forma inesperada na produção ao buscar subpropriedades profundas em objetos dinâmicos ou de APIs.',
+    concept: 'O operador de encadeamento opcional `?.` verifica se a referência anterior é nula ou indefinida antes de prosseguir com a leitura da propriedade subsequente. Se for nula, ele aborta e devolve `undefined` em vez de disparar uma exceção de quebra de script.',
+    track: 'js',
+    difficulty: 'iniciante',
+    task: 'Forje uma função segura de recuperação de perfil. Escreva a função `obterApelido(avatares)`. Ela deve navegar de forma segura e retornar o valor de `avatares?.jogador?.perfil?.nickname` usando estritamente o operador de encadeamento opcional.',
+    initialCode: 'function obterApelido(avatares) {\n  // Resgate de forma 100% segura sem usar condicionais longas\n  \n}',
+    solutionExample: 'function obterApelido(avatares) {\n  return avatares?.jogador?.perfil?.nickname;\n}',
+    tests: [
+      { id: 't1', description: 'Deve conter a declaração da função obterApelido', ruleType: 'regex', expected: 'function\\s+obterApelido\\s*\\(\\s*avatares\\s*\\)' },
+      { id: 't2', description: 'Deve utilizar o operador ?. para navegar por jogador, perfil e retornar nickname', ruleType: 'regex', expected: 'avatares\\?\\.jogador\\?\\.perfil\\?\\.nickname' }
+    ],
+    hint: 'Aplique as interrogações seguidas de pontos: return avatares?.jogador?.perfil?.nickname;',
+    coinsReward: 40,
+    xpReward: 200,
+    order: 8
+  },
+  {
+    id: 'js_adv_10',
+    title: 'Mestre das Requisições Paralelas: Promise.all',
+    description: 'Em vez de aguardar uma chamada de API demorada após a outra consecutiva de forma letárgica e ineficiente, execute requisições de forma simultânea poupando tempo crítico de carregamento de páginas!',
+    concept: 'O método `Promise.all(arrayDePromises)` aguarda todas as promessas da lista serem resolvidas de forma simultânea no runtime e retorna um array consolidado com todas as respostas na mesma ordem do vetor inicial.',
+    track: 'js',
+    difficulty: 'avancado',
+    task: 'Desenvolva uma função auxiliar assíncrona com o nome exato `carregarDadosParalelos(promiseMoedas, promiseVidas)`. Ela deve aguardar concorrentemente o fechamento das duas promessas enviadas usando `Promise.all` em uma estrutura com `async/await`.',
+    initialCode: 'async function carregarDadosParalelos(promiseMoedas, promiseVidas) {\n  // Desperte as chamadas concorrentemente para poupar tempo precioso\n  \n}',
+    solutionExample: 'async function carregarDadosParalelos(promiseMoedas, promiseVidas) {\n  return await Promise.all([promiseMoedas, promiseVidas]);\n}',
+    tests: [
+      { id: 't1', description: 'Deve declarar a função assíncrona utilizando a palavra-chave async', ruleType: 'regex', expected: 'async\\s+function\\s+carregarDadosParalelos' },
+      { id: 't2', description: 'Deve invocar a resolução simultânea com Promise.all', ruleType: 'regex', expected: 'Promise\\.all' },
+      { id: 't3', description: 'Deve agrupar as promessas correspondentes em um array no argumento', ruleType: 'regex', expected: 'Promise\\.all\\(\\s*\\[\\s*promiseMoedas\\s*,\\s*promiseVidas\\s*\\]\\s*\\)' }
+    ],
+    hint: 'Insira as promessas de moedas e vidas em um colchete e use: return await Promise.all([promiseMoedas, promiseVidas]);',
+    coinsReward: 60,
+    xpReward: 350,
+    order: 20
+  },
+  {
+    id: 'html_adv_9',
+    title: 'A Bússola do Destino (Meta Viewport)',
+    description: 'Toda página moderna precisa se adaptar perfeitamente aos displays de celulares e tablets. No freeCodeCamp, aprendemos que sem calibrar a janela de visualização (viewport), os navegadores de celular simulam uma tela larga de desktop, deixando os textos minúsculos.',
+    concept: 'A meta tag `<meta name="viewport" content="...">` instrui o navegador a ajustar as proporções de escala do site baseando-se no dispositivo do usuário. Definir o atributo content com as especificações `width=device-width` e `initial-scale=1.0` é o passo fundamental obrigatório para a conformidade responsiva e acessibilidade de qualquer projeto web.',
+    track: 'html',
+    difficulty: 'avancado',
+    task: 'Configure o viewport responsivo do castelo móvel. Adicione uma tag unificadora `<meta>` que carregue o atributo `name="viewport"` e o atributo de controle `content="width=device-width, initial-scale=1.0"`.',
+    initialCode: '<!-- Insira a configuração de viewport responsiva -->\n',
+    solutionExample: '<meta name="viewport" content="width=device-width, initial-scale=1.0">',
+    tests: [
+      { id: 't1', description: 'Deve ser uma tag <meta> válida', ruleType: 'regex', expected: '<meta[^>]*>' },
+      { id: 't2', description: 'Deve possuir o atributo name definido em viewport', ruleType: 'regex', expected: 'name=["\']viewport["\']' },
+      { id: 't3', description: 'Deve possuir o atributo content configurado com width=device-width e initial-scale=1.0', ruleType: 'regex', expected: 'content=["\']width=device-width,\\s*initial-scale=1\\.0["\']' }
+    ],
+    hint: 'Use exatamente: <meta name="viewport" content="width=device-width, initial-scale=1.0">',
+    coinsReward: 50,
+    xpReward: 250,
+    order: 21
+  },
+  {
+    id: 'html_int_8',
+    title: 'O Selo Imperial (Atributo Pattern)',
+    description: 'Seus formulários nunca devem aceitar dados mal-formados. No freeCodeCamp, aprendemos a utilizar as capacidades nativas de validação do HTML5 para criar regras instantâneas de integridade sem depender do JavaScript.',
+    concept: 'O atributo `pattern` aceita uma Expressão Regular (Regex) no cliente. Quando o formulário é submetido, o navegador automaticamente valida a entrada do usuário e impede o envio disparando um balão nativo de alerta se o dado estiver incorreto.',
+    track: 'html',
+    difficulty: 'intermediario',
+    task: 'Crie uma caixa de entrada imperial obrigatória com validação de código secreto. Crie uma tag `<input type="text">` aplicando os atributos:\n1. O atributo booleano de obrigatoriedade `required`.\n2. O validador de regra rúnica `pattern="[A-Z]{3}[0-9]{4}"` (que exige exatamente 3 letras maiúsculas seguidas de 4 números).',
+    initialCode: '<!-- Forje o input com validação imperial de segurança -->\n',
+    solutionExample: '<input type="text" pattern="[A-Z]{3}[0-9]{4}" required>',
+    tests: [
+      { id: 't1', description: 'Deve conter a tag de abertura <input>', ruleType: 'regex', expected: '<input[^>]*>' },
+      { id: 't2', description: 'O input deve possuir o atributo required presente', ruleType: 'regex', expected: 'required' },
+      { id: 't3', description: 'O input deve aplicar a expressão regular pattern="[A-Z]{3}[0-9]{4}"', ruleType: 'regex', expected: 'pattern=["\']\\[A-Z\\]\\{3\\}\\[0-9\\]\\{4\\}["\']' }
+    ],
+    hint: 'Forje um input de texto com o atributo required e o pattern="[A-Z]{3}[0-9]{4}" correspondente.',
+    coinsReward: 50,
+    xpReward: 250,
+    order: 15
+  },
+  {
+    id: 'html_adv_10',
+    title: 'O Portal de Telas (A tag picture)',
+    description: 'Carregar imagens pesadas de desktop em conexões móveis lenta é um erro de performance crucial. O freeCodeCamp nos ensina que podemos servir imagens perfeitamente resolvidas e recortadas dependendo da largura do dispositivo.',
+    concept: 'O contêiner `<picture>` trabalha em harmonia com elementos `<source>` e um elemento de fallback definitivo `<img>`. O elemento `<source>` monitora anomalias de tela com recursos de `media` e injeta a fonte ideal em `srcset`. Se nenhuma consulta condicional for atendida, a tag de fallback `<img>` é desenhada na tela.',
+    track: 'html',
+    difficulty: 'avancado',
+    task: 'Desenvolva uma imagem responsiva inteligente. Declare uma tag contêiner `<picture></picture>`. No seu interior aninhe:\n1. Uma tag `<source media="(min-width: 800px)" srcset="highres.jpg">` para layouts largos.\n2. Uma tag fallback `<img>` com `src="lowres.jpg"` para dispositivos compactos.',
+    initialCode: '<!-- Prepare o picture com carregamento seletivo de resoluções -->\n',
+    solutionExample: '<picture>\n  <source media="(min-width: 800px)" srcset="highres.jpg">\n  <img src="lowres.jpg">\n</picture>',
+    tests: [
+      { id: 't1', description: 'Deve possuir a tag picture envolvendo o conteúdo do portal', ruleType: 'regex', expected: '<picture>[\\s\\S]*<\\/picture>' },
+      { id: 't2', description: 'Deve declarar o elemento source com media="(min-width: 800px)" e srcset="highres.jpg"', ruleType: 'regex', expected: '<source[^>]*media=["\']\\s*\\(\\s*min-width:\\s*800px\\s*\\)\\s*["\'][^>]*srcset=["\']highres\\.jpg["\']|<source[^>]*srcset=["\']highres\\.jpg["\'][^>]*media=["\']\\s*\\(\\s*min-width:\\s*800px\\s*\\)\\s*["\']' },
+      { id: 't3', description: 'Deve possuir a tag img com src="lowres.jpg" definida', ruleType: 'regex', expected: '<img[^>]*src=["\']lowres\\.jpg["\']' }
+    ],
+    hint: 'Construa a hierarquia aninhando o <source> e o <img src="lowres.jpg"> no interior de <picture>.',
+    coinsReward: 60,
+    xpReward: 350,
+    order: 22
+  },
+  {
+    id: 'css_ini_7',
+    title: 'O Escudo Rúnico (Valores de Fallback)',
+    description: 'Ao projetar grandes sistemas de design com temas (claro/escuro), as variáveis globais podem ocasionalmente falhar ou não serem resolvidas. O freeCodeCamp nos ensina a forjar estilos ultra-resistentes definindo alternativas de contingência.',
+    concept: 'Ao invocar variáveis de folha usando a função clássica `var()`, você pode prover um valor de fallback como segundo argumento opcional separado por vírgula: `var(--nome-variavel, cor-fallback)`. Caso o navegador não encontre a variável no escopo, adota no mesmo instante a cor padrão de segurança.',
+    track: 'css',
+    difficulty: 'iniciante',
+    task: 'Estilize o escudo blindado do guerreiro. Na classe `.escudo`, configure a propriedade `background-color` chamando a variável `--cor-mana`. Lembre-se de prover como fallback seguro a cor `"blue"` caso ela esteja inacessível.',
+    initialCode: '.escudo {\n  /* Traga estabilidade de cor ao escudo rúnico */\n  \n}',
+    solutionExample: '.escudo {\n  background-color: var(--cor-mana, blue);\n}',
+    tests: [
+      { id: 't1', description: 'Deve conter a classe .escudo ativa no escopo', ruleType: 'regex', expected: '\\.escudo\\s*\\{' },
+      { id: 't2', description: 'Deve definir background-color usando var() combinando --cor-mana e fallback blue', ruleType: 'regex', expected: 'background-color\\s*:\\s*var\\s*\\(\\s*--cor-mana\\s*,\\s*blue\\s*\\)' }
+    ],
+    hint: 'Forje exatamente a linha: background-color: var(--cor-mana, blue);',
+    coinsReward: 40,
+    xpReward: 200,
+    order: 8
+  },
+  {
+    id: 'css_int_9',
+    title: 'A Torre Adaptativa (Unidade dvh Móvel)',
+    description: 'Desenhar interfaces que medem a tela cheia com a antiga unidade `100vh` quebra o design de celulares por conta do menu dinâmico que o Safari ou Google Chrome exibem no topo ou no rodapé. O freeCodeCamp ensina a projetar designs robustos usando medições dinâmicas.',
+    concept: 'A unidade moderna `dvh` (Dynamic Viewport Height) resolve os gargalos de displays móveis. Ela calcula a altura da tela dinamicamente em tempo real, compensando instantaneamente a compressão física quando as barras utilitárias do navegador surgem ou colapsam.',
+    track: 'css',
+    difficulty: 'intermediario',
+    task: 'Ajuste o tamanho modular da masmorra vertical. Estilize a classe `.torre-dinamica` atribuindo a sua altura `height` para medir exatamente cem por cento da altura dinâmica do celular usando a unidade moderna `100dvh`.',
+    initialCode: '.torre-dinamica {\n  /* Calibre a altura total adaptativa de torre */\n  \n}',
+    solutionExample: '.torre-dinamica {\n  height: 100dvh;\n}',
+    tests: [
+      { id: 't1', description: 'Deve carregar as propriedades para a classe .torre-dinamica', ruleType: 'regex', expected: '\\.torre-dinamica\\s*\\{' },
+      { id: 't2', description: 'Deve ajustar height para reter exatamente 100dvh', ruleType: 'regex', expected: 'height\\s*:\\s*100dvh\\s*;' }
+    ],
+    hint: 'No bloco operacional insira a instrução: height: 100dvh;',
+    coinsReward: 50,
+    xpReward: 250,
+    order: 15
+  },
+  {
+    id: 'css_adv_9',
+    title: 'A Proporção Áurea (aspect-ratio)',
+    description: 'Imagens de perfil redondas, cartões de aventura e tocadores de música devem reter suas formatos quadrados ou retangulares perfeitos enquanto encolhem ou esticam responsivamente de forma automática.',
+    concept: 'A propriedade nativa `aspect-ratio` do CSS3 permite estipular uma proporção de caixas direta (como 16/9, 4/3 ou 1/1). O navegador calcula a altura correspondente automaticamente com base na largura atual do elemento, mantendo a geometria intacta de forma fluida sem requerer hacks.',
+    track: 'css',
+    difficulty: 'avancado',
+    task: 'Determine a proporção do pergaminho de vídeo. Insira na classe `.pergaminho` a propriedade de proporção `aspect-ratio` configurando-a no formato clássico de cinema `16/9`.',
+    initialCode: '.pergaminho {\n  /* Preserve a proporção geométrica do pergaminho */\n  \n}',
+    solutionExample: '.pergaminho {\n  aspect-ratio: 16/9;\n}',
+    tests: [
+      { id: 't1', description: 'Deve configurar a classe .pergaminho nas regras', ruleType: 'regex', expected: '\\.pergaminho\\s*\\{' },
+      { id: 't2', description: 'Deve ditar a propriedade aspect-ratio contendo 16/9', ruleType: 'regex', expected: 'aspect-ratio\\s*:\\s*16\\s*/\\s*9' }
+    ],
+    hint: 'Insira a diretriz aspect-ratio: 16/9; no corpo da classe de estilo.',
+    coinsReward: 60,
+    xpReward: 350,
+    order: 21
+  },
+  {
+    id: 'css_adv_10',
+    title: 'A Runa Pulsante (Animações @keyframes)',
+    description: 'A interatividade sofisticada do freeCodeCamp demonstra como criar movimentos que chamam a atenção do recruta sem requerer pacotes JavaScript externos de manipulação de coordenadas.',
+    concept: 'A regra `@keyframes` permite descrever um trajeto de movimentos ou transformações estéticas especificando frações (como `from`/`to`, ou `0%`/`100%`). Associamos esse feitiço estético a qualquer classe de elemento HTML usando a propriedade agregadora `animation`.',
+    track: 'css',
+    difficulty: 'avancado',
+    task: 'Monte uma animação pulsante eterna de runa solar. Escreva a folha aplicando:\n1. A regra `@keyframes pulsar` que transicione de `from { transform: scale(1); }` até `to { transform: scale(1.15); }`.\n2. Na classe `.runa`, vincule a animação definindo: `animation: pulsar 1.5s infinite alternate;`.',
+    initialCode: '.runa {\n  \n}\n\n/* Implemente o @keyframes pulsar abaixo */\n',
+    solutionExample: '.runa {\n  animation: pulsar 1.5s infinite alternate;\n}\n@keyframes pulsar {\n  from { transform: scale(1); }\n  to { transform: scale(1.15); }\n}',
+    tests: [
+      { id: 't1', description: 'Deve declarar o elemento @keyframes pulsar na folha', ruleType: 'regex', expected: '@keyframes\\s+pulsar\\s*\\{[\\s\\S]*?from[\\s\\S]*?transform\\s*:\\s*scale\\s*\\(\\s*1\\s*\\)[\\s\\S]*?to[\\s\\S]*?transform\\s*:\\s*scale\\s*\\(\\s*1\\.15\\s*\\)' },
+      { id: 't2', description: 'Deve invocar a animação pulsar na classe .runa de modo infinito e alternado', ruleType: 'regex', expected: '\\.runa\\s*\\{[\\s\\S]*?animation\\s*:\\s*pulsar\\s+1\\.5s\\s+infinite\\s+alternate' }
+    ],
+    hint: 'Certifique de fechar perfeitamente as chaves das regras internas do @keyframes e as chaves do .runa.',
+    coinsReward: 60,
+    xpReward: 350,
+    order: 22
+  },
+  {
+    id: 'js_ini_7',
+    title: 'Desestruturando o Baú (Destructuring Objetos)',
+    description: 'Acessar dados repetidamente em estruturas complexas com instruções como let ouro = bau.ouro polui as vistas de código. O freeCodeCamp nos ensina a abrir contêineres colhendo exclusivamente o que precisamos na mesma linha.',
+    concept: 'A desestruturação de objetos (`destructuring`) permite extrair variáveis de chaves de objetos diretamente usando uma sintaxe limpa de espelho: `const { ouro, gemas } = bau;`. O compilador mapeia as chaves locais na mesma declaração.',
+    track: 'js',
+    difficulty: 'iniciante',
+    task: 'Abra o baú do mago rúnico. Escreva a função `abrirBau(bau)` para que:\n1. Desestruture de forma limpa as variáveis de propriedade `ouro` e `gemas` do argumento de objeto `bau` em uma única linha.\n2. Retorne o alerta exato juntando strings: `"Você obteve: "` concatenando à variável extraída `ouro`.',
+    initialCode: 'function abrirBau(bau) {\n  // Desestruture as propriedades do baú imperial\n  \n}',
+    solutionExample: 'function abrirBau(bau) {\n  const { ouro, gemas } = bau;\n  return "Você obteve: " + ouro;\n}',
+    tests: [
+      { id: 't1', description: 'Deve declarar a desestruturação legítima extraindo ouro e gemas de bau', ruleType: 'regex', expected: '(const|let|var)\\s*\\{\\s*ouro\\s*,\\s*gemas\\s*\\}\\s*=\\s*bau' },
+      { id: 't2', description: 'Deve retornar a string fundida conforme explicitado acima', ruleType: 'regex', expected: 'return\\s+["\']Você obteve: ["\']\\s*\\+\\s*ouro|return\\s*[`]Você obteve: \\$\\{ouro\\}[`]' }
+    ],
+    hint: 'Inicie extraindo as chaves: const { ouro, gemas } = bau; e complete retornando a frase pedida.',
+    coinsReward: 40,
+    xpReward: 200,
+    order: 9
+  },
+  {
+    id: 'js_int_9',
+    title: 'A Expansão Spread (Concatenação de Mochilas)',
+    description: 'Tentar mesclar múltiplos arrays ou criar cópias independentes sem passar lógicas de referência em arrays exige laços e rotinas prolixas. Domine o simplificado operador spread de descompactar listas.',
+    concept: 'O operador rest/spread (`...`) atua como um descompactador de coleções de dados. Ao usarmos `[...mochilaA, ...mochilaB]`, o runtime extrai individualmente as marcas de cada array fundindo-os em um novíssimo arranjo.',
+    track: 'js',
+    difficulty: 'intermediario',
+    task: 'Concatene inventários imperiais. Escreva uma função chamada `mesclarMochilas(mochilaA, mochilaB)` que recolha ambos arrays e retorne uma única lista contendo a fusão deles recorrendo exclusivamente ao operador spread (`...`).',
+    initialCode: 'function mesclarMochilas(mochilaA, mochilaB) {\n  // Espalhe e funda os arrays em uma lista unificada\n  \n}',
+    solutionExample: 'function mesclarMochilas(mochilaA, mochilaB) {\n  return [...mochilaA, ...mochilaB];\n}',
+    tests: [
+      { id: 't1', description: 'Deve conter a assinatura e parâmetros para a função mesclarMochilas', ruleType: 'regex', expected: 'function\\s+mesclarMochilas\\s*\\(\\s*mochilaA\\s*,\\s*mochilaB\\s*\\)' },
+      { id: 't2', description: 'Deve devolver um array contendo a concatenação via spread de mochilaA e mochilaB', ruleType: 'regex', expected: 'return\\s*\\[\\s*\\.\\.\\.mochilaA\\s*,\\s*\\.\\.\\.mochilaB\\s*\\]' }
+    ],
+    hint: 'Retorne diretamente o array composto: return [...mochilaA, ...mochilaB];',
+    coinsReward: 50,
+    xpReward: 250,
+    order: 15
+  },
+  {
+    id: 'js_adv_11',
+    title: 'Sincronia Assíncrona: Async e Await',
+    description: 'Quando lidamos com comunicações externas que demoram (carregar dados de servidores ou consultar bancos de dados), encadear blocos de callback ou infinidades de métodos .then() cria o chamado callback hell. O freeCodeCamp ensina a organizar fluxes assíncronos de forma sequencial com async/await.',
+    concept: 'A diretriz `async` declara que a função retornará uma Promise de forma intrínseca. No corpo operacional dela, a palavra-chave mágicas `await` faz o motor suspender a progressão do fluxo até que a Promise correlata retorne com êxito, entregando clareza de fluxo idêntica a códigos síncronos.',
+    track: 'js',
+    difficulty: 'avancado',
+    task: 'Codifique uma comunicação assíncrona rúnica. Crie uma função assíncrona chamada `recrutarGuerreiro(api)`. No corpo dela, suspenda a rotina esperando a chamada concorrente `api.getDados()` usando `await`, armazene-a em uma constante e retorne esse valor obtido.',
+    initialCode: '// Forje a comunicação assíncrona com os comandos do templo\n',
+    solutionExample: 'async function recrutarGuerreiro(api) {\n  const resultado = await api.getDados();\n  return resultado;\n}',
+    tests: [
+      { id: 't1', description: 'A função deve conter a identificação async na assinatura do método', ruleType: 'regex', expected: 'async\\s+function\\s+recrutarGuerreiro' },
+      { id: 't2', description: 'Deve utilizar a parada await antes de disparar o método api.getDados()', ruleType: 'regex', expected: 'await\\s+api\\.getDados\\s*\\(\\s*\\)' },
+      { id: 't3', description: 'Deve devolver o valor recuperado da Promise com instrução de retorno', ruleType: 'regex', expected: 'return\\s+' }
+    ],
+    hint: 'Use a estrutura async function recrutarGuerreiro(api) { const d = await api.getDados(); return d; }.',
+    coinsReward: 60,
+    xpReward: 350,
+    order: 21
   }
 ];
 
