@@ -1,0 +1,6 @@
+{
+  "name": "CodeQuest",
+  "description": "Uma plataforma de aprendizado de programação gamificada com mapas de jornada e editor interativo para trilhas de HTML, CSS e JavaScript.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

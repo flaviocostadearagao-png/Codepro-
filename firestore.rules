@@ -1,0 +1,73 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Global Safety Net (Default Deny)
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Reuseable global helpers
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isEmailVerified() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // User data structural verification (Anti-Update-Gap)
+    function isValidUser(data) {
+      return data.keys().hasAll([
+        'xp', 'level', 'hearts', 'maxHearts', 'coins', 'streak', 
+        'lastActiveDate', 'completedLessons', 'unlockedAchievements', 
+        'activeTrack', 'dailyMissions'
+      ]) && data.keys().size() == 11
+         && data.xp is int && data.xp >= 0
+         && data.level is int && data.level >= 1
+         && data.hearts is int && data.hearts >= 0
+         && data.maxHearts is int && data.maxHearts >= 1
+         && data.coins is int && data.coins >= 0
+         && data.streak is int && data.streak >= 0
+         && data.lastActiveDate is string && data.lastActiveDate.size() <= 128
+         && data.completedLessons is list && data.completedLessons.size() <= 500
+         && data.unlockedAchievements is list && data.unlockedAchievements.size() <= 50
+         && data.activeTrack is string && (data.activeTrack == 'html' || data.activeTrack == 'css' || data.activeTrack == 'js')
+         && data.dailyMissions is list && data.dailyMissions.size() <= 10;
+    }
+
+    // Section for player accounts - only owner can access and modify their own record
+    match /users/{userId} {
+      allow get: if isSignedIn() && userId == request.auth.uid;
+      
+      allow create: if isSignedIn() 
+                    && isEmailVerified()
+                    && isValidId(userId) 
+                    && userId == request.auth.uid 
+                    && isValidUser(incoming());
+                    
+      allow update: if isSignedIn() 
+                    && isEmailVerified()
+                    && isValidId(userId) 
+                    && userId == request.auth.uid 
+                    && isValidUser(incoming());
+                    
+      allow delete: if isSignedIn() 
+                    && isEmailVerified()
+                    && isValidId(userId) 
+                    && userId == request.auth.uid;
+    }
+  }
+}
