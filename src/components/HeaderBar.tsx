@@ -5,8 +5,9 @@
 
 import React, { useState } from 'react';
 import { UserStats, TrackType } from '../types';
-import { Flame, Heart, Award, Sparkles, Swords, RefreshCw, Cloud, LogOut } from 'lucide-react';
+import { Flame, Heart, Award, Sparkles, Swords, RefreshCw, Cloud, LogOut, RotateCcw } from 'lucide-react';
 import { User } from 'firebase/auth';
+import { SYLLABUS } from '../data/syllabus';
 
 interface HeaderBarProps {
   stats: UserStats;
@@ -19,6 +20,7 @@ interface HeaderBarProps {
   onSignIn: () => void;
   onSignOut: () => void;
   onLoadToken: (token: string) => void;
+  onResetStats: () => void;
 }
 
 export default function HeaderBar({
@@ -31,7 +33,8 @@ export default function HeaderBar({
   authLoading,
   onSignIn,
   onSignOut,
-  onLoadToken
+  onLoadToken,
+  onResetStats
 }: HeaderBarProps) {
   const [healingFeedback, setHealingFeedback] = useState(false);
   const [copiedFeedback, setCopiedFeedback] = useState(false);
@@ -40,6 +43,26 @@ export default function HeaderBar({
   // Experience threshold for next level: lvl * 300 + 400
   const nextLevelXP = stats.level * 300 + 400;
   const xpPercentage = Math.min(100, Math.floor((stats.xp / nextLevelXP) * 100));
+
+  // Course progression calculations
+  const totalLessons = SYLLABUS ? SYLLABUS.length : 0;
+  const completedLessonsCount = stats.completedLessons ? stats.completedLessons.length : 0;
+  const courseProgressPercentage = totalLessons > 0 ? Math.round((completedLessonsCount / totalLessons) * 100) : 0;
+
+  // Determine course division/rank: Iniciante (0-34%), Intermediário (35-74%), Avançado (75-100%)
+  let courseDifficultyRank = 'Iniciante 🟢';
+  let courseRankColor = 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30';
+  let rankProgressBarColor = 'from-emerald-500 via-teal-500 to-emerald-400';
+  
+  if (courseProgressPercentage >= 35 && courseProgressPercentage < 75) {
+    courseDifficultyRank = 'Intermediário 🔵';
+    courseRankColor = 'text-sky-400 bg-sky-500/10 border-sky-500/30';
+    rankProgressBarColor = 'from-sky-500 via-blue-500 to-indigo-500';
+  } else if (courseProgressPercentage >= 75) {
+    courseDifficultyRank = 'Avançado 🟣';
+    courseRankColor = 'text-purple-400 bg-purple-500/10 border-purple-500/30';
+    rankProgressBarColor = 'from-purple-500 via-fuchsia-600 to-pink-500';
+  }
 
   const handleHealClick = () => {
     if (stats.hearts >= stats.maxHearts) return;
@@ -188,6 +211,44 @@ export default function HeaderBar({
             )}
           </div>
 
+        </div>
+      </div>
+
+      {/* COURSE PROGRESSION CONTROLLER & MILESTONE INDICATORS */}
+      <div className="mt-4 p-4 bg-slate-950/80 rounded-xl border border-slate-800/80">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-3">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="font-extrabold text-sm text-slate-200">🎓 Progresso Geral do Curso:</span>
+              <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wide border ${courseRankColor}`}>
+                Rank: {courseDifficultyRank}
+              </span>
+            </div>
+            <p className="text-slate-400 text-xs mt-1">
+              Complete lições para avançar no curso. Você já concluiu <span className="text-indigo-400 font-bold">{completedLessonsCount}</span> de <span className="text-slate-300 font-bold">{totalLessons}</span> lições disponíveis ({courseProgressPercentage}%).
+            </p>
+          </div>
+        </div>
+
+        {/* Progress bar track with markers */}
+        <div className="relative w-full bg-slate-900 h-4 rounded-full border border-slate-800/80 p-0.5 mt-2 select-none">
+          <div
+            className={`bg-gradient-to-r ${rankProgressBarColor} h-full rounded-full transition-all duration-700 shadow-[0_0_10px_rgba(129,140,248,0.3)]`}
+            style={{ width: `${courseProgressPercentage}%` }}
+          />
+          
+          {/* Milestone markers on track */}
+          {/* 35% Marker */}
+          <div className="absolute top-0 bottom-0 left-[35%] w-0.5 bg-slate-950" title="Milestone: Intermediário (35%)" />
+          {/* 75% Marker */}
+          <div className="absolute top-0 bottom-0 left-[75%] w-0.5 bg-slate-950" title="Milestone: Avançado (75%)" />
+        </div>
+
+        {/* Labels for landmarks */}
+        <div className="flex justify-between text-[10px] font-bold text-slate-500 mt-1.5 px-1">
+          <span className={courseProgressPercentage < 35 ? "text-emerald-400 font-extrabold" : ""}>Iniciante (0%)</span>
+          <span className={(courseProgressPercentage >= 35 && courseProgressPercentage < 75) ? "text-sky-400 font-extrabold" : ""}>Intermediário (35%)</span>
+          <span className={courseProgressPercentage >= 75 ? "text-purple-400 font-extrabold" : ""}>Avançado (75%)</span>
         </div>
       </div>
 

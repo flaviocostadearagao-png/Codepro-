@@ -906,6 +906,310 @@ export const SYLLABUS: Lesson[] = [
     coinsReward: 50,
     xpReward: 300,
     order: 15
+  },
+  {
+    id: 'html_int_6',
+    title: 'Ancoragem de Formulários (Fieldset & Legend)',
+    description: 'A organização é o escudo do programador. Agrupar campos de entrada relacionados é uma lição indispensável para formulários corporativos sustentáveis e estruturalmente impecáveis.',
+    concept: 'A tag `<fieldset>` cria uma borda elegante demarcando um grupo de elementos relacionados em formulários. O elemento `<legend>` é aninhado como primeiro filho e serve como rótulo semântico incorporado à borda do fieldset para acessibilidade superior.',
+    track: 'html',
+    difficulty: 'intermediario',
+    task: 'Desenvolva uma divisão estruturada de formulário criando um elemento de abertura e fechamento `<fieldset>` e, aninhado dentro dele, declare uma tag de legenda `<legend>` exibindo o texto "Classe Seleta".',
+    initialCode: '<!-- Agrupe os dados com fieldset e legend -->\n',
+    solutionExample: '<fieldset>\n  <legend>Classe Seleta</legend>\n</fieldset>',
+    tests: [
+      { id: 't1', description: 'Deve possuir contêiner <fieldset> de abertura e fechamento', ruleType: 'regex', expected: '<fieldset[^>]*>[\\s\\S]*<\\/fieldset>' },
+      { id: 't2', description: 'Deve carregar elemento de cabeçalho <legend> interno', ruleType: 'regex', expected: '<fieldset[^>]*>[\\s\\S]*?<legend[^>]*>[\\s\\S]*?<\\/legend>[\\s\\S]*?<\\/fieldset>' },
+      { id: 't3', description: 'O cabeçalho legend deve exibir exatamente "Classe Seleta"', ruleType: 'regex', expected: '<legend[^>]*>\\s*Classe Seleta\\s*<\\/legend>' }
+    ],
+    hint: 'Desenvolva a tag <fieldset> e insira a tag <legend>Classe Seleta</legend> logo dentro para criar o contorno demarcador.',
+    coinsReward: 35,
+    xpReward: 185,
+    order: 11
+  },
+  {
+    id: 'html_adv_6',
+    title: 'Painéis de Revelação (Details & Summary)',
+    description: 'Para otimizar o espaço do portfólio ou das páginas de perguntas frequentes do clã, aprenda a ocultar respostas complexas de forma puramente nativa, sem carregar sequer um byte de scripts.',
+    concept: 'A tag `<details>` atua criando um painel expansível interativo que opera no nível nativo do navegador. O elemento `<summary>` atua como o cabeçalho clicável fixo. Quando o usuário clica sobre o botão de sumário, o navegador exibe o restante dos parágrafos contidos.',
+    track: 'html',
+    difficulty: 'avancado',
+    task: 'Crie uma tag `<details>`. Dentro dela, declare uma tag `<summary>` contendo o texto "Segredos Cósmicos" e, logo abaixo, um parágrafo `<p>` com o texto "Parabéns, você colocou detalhes!".',
+    initialCode: '<!-- Forje o painel expansível -->\n',
+    solutionExample: '<details>\n  <summary>Segredos Cósmicos</summary>\n  <p>Parabéns, você colocou detalhes!</p>\n</details>',
+    tests: [
+      { id: 't1', description: 'Deve carregar elemento contêiner expansível <details>', ruleType: 'regex', expected: '<details[^>]*>[\\s\\S]*<\\/details>' },
+      { id: 't2', description: 'O details deve possuir um botão rígido <summary> com o título correto', ruleType: 'regex', expected: '<summary[^>]*>\\s*Segredos Cósmicos\\s*<\\/summary>' },
+      { id: 't3', description: 'Deve carregar a resposta envolta em parágrafo <p>', ruleType: 'regex', expected: '<p[^>]*>\\s*Parabéns,\\s+você\\s+colocou\\s+detalhes!\\s*<\\/p>' }
+    ],
+    hint: 'Escreva <details> de forma geral. Aninhe dentro o <summary>Segredos Cósmicos</summary> e em seguida o parágrafo explicativo.',
+    coinsReward: 45,
+    xpReward: 255,
+    order: 16
+  },
+  {
+    id: 'css_int_6',
+    title: 'Alinhamento Vertical e Quebra (Flex wrap & Align items)',
+    description: 'Quando seu navio de layout encontra portos de tamanhos variáveis, os caixotes de itens precisam se organizar ordenadamente para evitar deformações ou quebra no visual.',
+    concept: 'As propriedades de preenchimento de fluxo central do Flexbox são comandadas por `flex-wrap` e `align-items`. Aplicar `flex-wrap: wrap;` autoriza as caixas de itens secundários a se acomodarem na linha seguinte se os limites físicos se estreitarem. Por outro lado, `align-items: center;` equilibra todas as células filhas centralizadas na linha perpendicular.',
+    track: 'css',
+    difficulty: 'intermediario',
+    task: 'Estilize na classe `.linha-frente` um container flexível definindo o display como "flex", a quebra como "wrap" (`flex-wrap: wrap;`) e alinhe seus filhos ao centro verticalmente usando `align-items: center;`.',
+    initialCode: '.linha-frente {\n  \n}',
+    solutionExample: '.linha-frente {\n  display: flex;\n  flex-wrap: wrap;\n  align-items: center;\n}',
+    tests: [
+      { id: 't1', description: 'Deve registrar display flexível na classe .linha-frente', ruleType: 'regex', expected: 'display\\s*:\\s*flex\\s*;' },
+      { id: 't2', description: 'Deve autorizar quebras de linha com flex-wrap wrap', ruleType: 'regex', expected: 'flex-wrap\\s*:\\s*wrap\\s*;' },
+      { id: 't3', description: 'Deve registrar alinhamento vertical centralizado por align-items center', ruleType: 'regex', expected: 'align-items\\s*:\\s*center\\s*;' }
+    ],
+    hint: 'Insira as diretivas CSS selecionadas dadas na classe .linha-frente fechando-as com eixos de ponto e vírgula.',
+    coinsReward: 35,
+    xpReward: 185,
+    order: 11
+  },
+  {
+    id: 'css_adv_6',
+    title: 'Manto do Degradê Tridimensional (CSS Gradients)',
+    description: 'A sofisticação visual separam as cascas comuns dos portais lendários. Sature de profundidade suas placas gerando misturas de cores fluidas.',
+    concept: 'A diretiva `linear-gradient` cria transições de cores em intervalos geométricos, devendo ser colocada como valor no atributo `background-image` (ou a simplficação `background`). Exemplo: `linear-gradient(to right, color1, color2)`.',
+    track: 'css',
+    difficulty: 'avancado',
+    task: 'Escreva nas regras da classe `.manto-sagrado` um plano de fundo contendo gradiente linear se movendo em direção à direita que transite entre as cores azul e vermelho (`linear-gradient(to right, blue, red)`).',
+    initialCode: '.manto-sagrado {\n  \n}',
+    solutionExample: '.manto-sagrado {\n  background-image: linear-gradient(to right, blue, red);\n}',
+    tests: [
+      { id: 't1', description: 'Estilização .manto-sagrado deve possuir propriedade background-image ou background', ruleType: 'regex', expected: 'background(-image)?\\s*:\\s*linear-gradient' },
+      { id: 't2', description: 'O gradiente linear deve progredir para a direita (to right)', ruleType: 'regex', expected: 'to\\s+right' },
+      { id: 't3', description: 'A paleta de cores deve fundir blue e red na ordem exata', ruleType: 'regex', expected: 'blue\\s*,\\s*red' }
+    ],
+    hint: 'Atribua background-image: linear-gradient(to right, blue, red); na classe descrita.',
+    coinsReward: 45,
+    xpReward: 255,
+    order: 16
+  },
+  {
+    id: 'js_int_6',
+    title: 'O Mapeador Alquímico (Array.map)',
+    description: 'Em vez de usar loops chatos, mutáveis e propensos a falhas de índice para alterar listas, domine a imutabilidade funcional transformando matrizes em frações de segundos.',
+    concept: 'O método nativo de arrays `.map()` cria uma cópia completamente limpa e transformada de um array original. Ele roda um callback e mapeia cada elemento processado para o novo array correspondente sem jamais ofender a fonte inicial.',
+    track: 'js',
+    difficulty: 'intermediario',
+    task: 'Desenvolva uma função `dobrarValores(lista)` que retorne as parcelas filtradas e duplicadas multiplicando cada entrada numérica de `lista` por exatamente "2" usando o método `.map()`.',
+    initialCode: 'function dobrarValores(lista) {\n  // Transforme os números com .map()\n  \n}',
+    solutionExample: 'function dobrarValores(lista) {\n  return lista.map(item => item * 2);\n}',
+    tests: [
+      { id: 't1', description: 'Deve possuir chamada para o método map estruturado', ruleType: 'regex', expected: '\\.map\\s*\\(' },
+      { id: 't2', description: 'A lógica de callback deve multiplicar por 2', ruleType: 'regex', expected: '\\*\\s*2|item\\s*\\*\\s*2' }
+    ],
+    hint: 'Chame return lista.map(x => x * 2); para fechar com maestria a lição de arrays funcionais.',
+    coinsReward: 35,
+    xpReward: 185,
+    order: 11
+  },
+  {
+    id: 'js_adv_6',
+    title: 'Sincronização Cósmica (Promise.all)',
+    description: 'Quando seu script heróico requisita inventários, frentes de dados e estatísticas ao mesmo tempo, esperar uma fila de forma alternada atrasa o jogo. Chame todos os dados de forma perfeitamente concorrente.',
+    concept: 'A diretiva assíncrona `Promise.all(array)` é extraordinariamente performática. Ela aguarda que todo o pacote de promessas seja completamente bem-sucedido juntas para liberar o resultado de lote consolidado de dados.',
+    track: 'js',
+    difficulty: 'avancado',
+    task: 'Implemente uma função `buscarDadosEmParalelo(promessaCard, promessaXP)` que retorne o resultado integrado em array das resoluções simultâneas usando `Promise.all`.',
+    initialCode: 'function buscarDadosEmParalelo(promessaCard, promessaXP) {\n  // Junte as promessas em paralelo\n  \n}',
+    solutionExample: 'function buscarDadosEmParalelo(promessaCard, promessaXP) {\n  return Promise.all([promessaCard, promessaXP]);\n}',
+    tests: [
+      { id: 't1', description: 'Deve invocar o método Promise.all de controle assíncrono', ruleType: 'regex', expected: 'Promise\\.all\\s*\\(' },
+      { id: 't2', description: 'Deve agrupar as promessas dentro de um array', ruleType: 'regex', expected: '\\[\\s*promessaCard\\s*,\\s*promessaXP\\s*\\]|promessaCard\\s*,\\s*promessaXP' }
+    ],
+    hint: 'Chame o retorno de Promise.all enviando as variáveis promessaCard e promessaXP juntas em formato de array de argumentos: Promise.all([p1, p2]).',
+    coinsReward: 45,
+    xpReward: 255,
+    order: 16
+  },
+  {
+    id: 'html_adv_7',
+    title: 'Forjando o Portal de Portfólio (Site Semântico Completo)',
+    description: 'Um mestre desenvolvedor deve saber estruturar sua primeira página de apresentação no clã! Una as tags mais profissionais do HTML5 para criar a fundação robusta do seu próprio portfólio na web.',
+    concept: 'Para criar um site semântico moderno e altamente legível para os buscadores da web, cada elemento tem seu lugar sagrado: `<header>` abraça o topo do cabeçalho, `<nav>` alinha a barra de links de navegação, `<main>` reúne o conteúdo principal de impacto, e as páginas ganham contornos profissionais.',
+    track: 'html',
+    difficulty: 'avancado',
+    task: 'Monte o esqueleto de um site de portfólio. Você deve criar:\n1. Um elemento `<header>` que possua um título `<h2>` com o texto exato "Guardião Dev".\n2. Um elemento `<nav>` contendo um link `<a>` com atributo `href="#contato"` e texto exato "Contato".\n3. Um elemento `<main>` contendo uma imagem `<img>` com o atributo `alt="Foto do Desenvolvedor"`.',
+    initialCode: '<!-- Crie aqui o seu site de portfólio semântico -->\n',
+    solutionExample: '<header>\n  <h2>Guardião Dev</h2>\n  <nav>\n    <a href="#contato">Contato</a>\n  </nav>\n</header>\n<main>\n  <img src="avatar.jpg" alt="Foto do Desenvolvedor" />\n</main>',
+    tests: [
+      { id: 't1', description: 'Deve conter um contêiner <header> de cabeçalho do site', ruleType: 'regex', expected: '<header[^>]*>[\\s\\S]*<\\/header>' },
+      { id: 't2', description: 'O <header> deve possuir título <h2> contendo exato "Guardião Dev"', ruleType: 'regex', expected: '<h2[^>]*>\\s*Guardião Dev\\s*<\\/h2>' },
+      { id: 't3', description: 'Deve carregar elemento <nav> com link para href="#contato" e texto "Contato"', ruleType: 'regex', expected: '<nav[^>]*>[\\s\\S]*<a[^>]*href="#contato"[^>]*>\\s*Contato\\s*<\\/a>[\\s\\S]*<\\/nav>' },
+      { id: 't4', description: 'Deve carregar o corpo principal <main> aninhando imagem com alt="Foto do Desenvolvedor"', ruleType: 'regex', expected: '<main[^>]*>[\\s\\S]*<img[^>]*alt="Foto do Desenvolvedor"[^>]*>[\\s\\S]*<\\/main>' }
+    ],
+    hint: 'Crie a tag <header> envolvendo o <h2> e a tag <nav>. Logo abaixo dele, crie a tag de corpo <main> contendo sua respectiva imagem <img alt="Foto do Desenvolvedor">.',
+    coinsReward: 60,
+    xpReward: 350,
+    order: 17
+  },
+  {
+    id: 'css_adv_7',
+    title: 'Cartão de Aventura Responsivo (Página de Captura do Clã)',
+    description: 'Muralhas rígidas que não se adaptam às telas de visualização celulares quebram a experiência do usuário. Vamos estilizar um cartão de captura (Hero Card) simulando o design de uma página real!',
+    concept: 'Uma caixa de conteúdo ou section de site moderno atrai atenção se possuir espaçamento interno adequado (`padding`), cantos polidos (`border-radius`), profundidade sombreada (`box-shadow`) e um fundo escuro elegante (`background-color`).',
+    track: 'css',
+    difficulty: 'avancado',
+    task: 'Estilize a classe `.cartao-site` do seu micro-site. Seu estilo deve aplicar de forma rigorosa as seguintes diretivas:\n1. Espaçamento de margem interna de exatamente `24px` (`padding: 24px;`).\n2. Cantos arredondados com curvatura de exatamente `12px` (`border-radius: 12px;`).\n3. Uma cor de fundo grafite escuro com o código hex `#0f172a` (`background-color: #0f172a;`).\n4. Uma sombra difusa de elevação física usando exato `box-shadow: 0 4px 10px rgba(0,0,0,0.5);`.',
+    initialCode: '.cartao-site {\n  \n}',
+    solutionExample: '.cartao-site {\n  padding: 24px;\n  border-radius: 12px;\n  background-color: #0f172a;\n  box-shadow: 0 4px 10px rgba(0,0,0,0.5);\n}',
+    tests: [
+      { id: 't1', description: 'Deve aplicar padding interno de exatos 24px', ruleType: 'regex', expected: 'padding\\s*:\\s*24px\\s*;' },
+      { id: 't2', description: 'Deve aplicar cantos arredondados de 12px', ruleType: 'regex', expected: 'border-radius\\s*:\\s*12px\\s*;' },
+      { id: 't3', description: 'Deve possuir cor de fundo escura #0f172a para o estilo do cartão', ruleType: 'regex', expected: 'background-color\\s*:\\s*#0f172a\\s*;' },
+      { id: 't4', description: 'Deve carregar sombra com box-shadow: 0 4px 10px rgba(0,0,0,0.5);', ruleType: 'regex', expected: 'box-shadow\\s*:\\s*0\\s+4px\\s+10px\\s+rgba\\(\\s*0\\s*,\\s*0\\s*,\\s*0\\s*,\\s*0\\.5\\s*\\)\\s*;' }
+    ],
+    hint: 'Atribua as quatro propriedades solicitadas dentro da classe .cartao-site. Se atente para a sintaxe exata da cor hex e dos espaçamentos em pixels.',
+    coinsReward: 60,
+    xpReward: 350,
+    order: 17
+  },
+  {
+    id: 'js_adv_7',
+    title: 'A Forja Dinâmica do DOM (Injeção de Sites sob Demanda)',
+    description: 'Páginas web profissionais não são placas de metal estáticas de texto; elas reagem às ações dos heróis e injetam elementos de forma reativa e sob demanda em tempo real. Domine a manipulação avançada de elementos em páginas!',
+    concept: 'Com o JavaScript moderno, podemos selecionar elementos do navegador dinamicamente usando `document.querySelector(\'seletor\')`. Após capturá-lo, alterar sua propriedade `.innerHTML` permite redesenhar novos componentes visuais na tela sob comando de funções e gatilhos.',
+    track: 'js',
+    difficulty: 'avancado',
+    task: 'Crie uma função simples chamada `gerarSiteDoHeroi(nomeHeroi)`. Esta função deve ler e editar dinamicamente o site:\n1. Ela deve recuperar o container com id `#preview-container` utilizando `document.querySelector(\'#preview-container\')`.\n2. Em seguida, ela deve substituir o HTML interno desse container (`innerHTML`) pelo título formatado: `\'<h1>\' + nomeHeroi + \'</h1>\'`.\n3. Por fim, ela deve retornar exatamente a mensagem de publicação: `\'Site de \' + nomeHeroi + \' publicado!\'`.',
+    initialCode: 'function gerarSiteDoHeroi(nomeHeroi) {\n  // Integre o DOM e publique o site dinamicamente\n  \n}',
+    solutionExample: 'function gerarSiteDoHeroi(nomeHeroi) {\n  const container = document.querySelector(\'#preview-container\');\n  container.innerHTML = \'<h1>\' + nomeHeroi + \'</h1>\';\n  return "Site de " + nomeHeroi + " publicado!";\n}',
+    tests: [
+      { id: 't1', description: 'Declarar a função gerarSiteDoHeroi recebendo o parâmetro nomeHeroi', ruleType: 'regex', expected: 'function\\s+gerarSiteDoHeroi\\s*\\(\\s*nomeHeroi\\s*\\)' },
+      { id: 't2', description: 'Deve recuperar o container usando document.querySelector com ID "#preview-container"', ruleType: 'regex', expected: 'document\\.querySelector\\s*\\(\\s*["\']#preview-container["\']\\s*\\)' },
+      { id: 't3', description: 'Deve alterar o innerHTML do container para injetar o element h1 com o nome', ruleType: 'regex', expected: 'innerHTML\\s*=\\s*["\']<h1>["\']\\s*\\+\\s*nomeHeroi\\s*\\+\\s*["\']</h1>["\']|innerHTML\\s*=\\s*[`]<h1>\\$\\{\\s*nomeHeroi\\s*\\}</h1>[`]' },
+      { id: 't4', description: 'Deve retornar a string confirmando a publicação com o nome de forma concatenada', ruleType: 'regex', expected: 'return\\s*["\']Site de ["\']\\s*\\+\\s*nomeHeroi\\s*\\+\\s*["\'] publicado!["\']|return\\s*[`]Site de \\$\\{\\s*nomeHeroi\\s*\\} publicado![`]' }
+    ],
+    hint: 'Declare a variável recolhendo querySelector(\'#preview-container\'), assinale a propriedade .innerHTML with h1 concatenando a variável, e finalize com o retorno exato.',
+    coinsReward: 60,
+    xpReward: 350,
+    order: 17
+  },
+  {
+    id: 'html_ini_6',
+    title: 'Projeto: Cartão de Perfil Pessoal de Recruta',
+    description: 'Agora que você conhece a estrutura elementar, reúna tudo para criar o seu próprio cartão virtual de cidadão dev!',
+    concept: 'Ao unificar títulos, parágrafos, listas e hiperlinks em um único arquivo, começamos a visualizar a engenharia de sites semióticos e portfólios no mundo exterior.',
+    track: 'html',
+    difficulty: 'iniciante',
+    task: 'Monte o cartão de apresentação do soldado estruturando as seguintes tags:\n1. Um cabeçalho `<h1>` com o texto "Aventureiro Iniciante".\n2. Um parágrafo de introdução `<p>` com o texto "Minhas metas de aprendizado:".\n3. Uma lista não de marcadores `<ul>` com dois itens `<li>` com os textos exatos "Aprender HTML" e "Dominar CSS" (respeitando esta ordem).\n4. Forje um hiperlink simples `<a>` com o atributo `href="https://codequest.com"` e o texto exato "Voltar ao Início".',
+    initialCode: '<!-- Forje o cartão de perfil pessoal completo -->\n',
+    solutionExample: '<h1>Aventureiro Iniciante</h1>\n<p>Minhas metas de aprendizado:</p>\n<ul>\n  <li>Aprender HTML</li>\n  <li>Dominar CSS</li>\n</ul>\n<a href="https://codequest.com">Voltar ao Início</a>',
+    tests: [
+      { id: 't1', description: 'Deve possuir o visualizador de cabeçalho principal <h1> com o texto adequado', ruleType: 'regex', expected: '<h1[^>]*>\\s*Aventureiro Iniciante\\s*<\\/h1>' },
+      { id: 't2', description: 'Deve possuir o enunciado de parágrafo <p> correto', ruleType: 'regex', expected: '<p[^>]*>\\s*Minhas metas de aprendizado:\\s*<\\/p>' },
+      { id: 't3', description: 'Deve possuir a lista não ordenada com itens detalhados "Aprender HTML" e "Dominar CSS"', ruleType: 'regex', expected: '<ul[^>]*>[\\s\\S]*?<li>\\s*Aprender HTML\\s*<\\/li>[\\s\\S]*?<li>\\s*Dominar CSS\\s*<\\/li>[\\s\\S]*?<\\/ul>' },
+      { id: 't4', description: 'Deve fechar com o botão a hiperlink apontando para https://codequest.com e texto Voltar ao Início', ruleType: 'regex', expected: '<a[^>]*href="https:\\/\\/codequest\\.com"[^>]*>\\s*Voltar ao Início\\s*<\\/a>' }
+    ],
+    hint: 'Preencha de forma consecutiva cada um dos quatro elementos solicitados cuidando para fechar cada uma das tags (h1, p, ul, li e a).',
+    coinsReward: 40,
+    xpReward: 200,
+    order: 6
+  },
+  {
+    id: 'html_int_7',
+    title: 'Projeto: Central de Feedback de Recrutas do Clã',
+    description: 'Mostre seu domínio sobre dados e entradas interativas! Conecte formulários, agrupadores de dados e novos elementos rádio/texto de feedback.',
+    concept: 'Ao preencher formulários aninhados a fieldset, organizamos componentes gráficos de entrada relacionados de forma profissional e escalável nos navegadores modernos.',
+    track: 'html',
+    difficulty: 'intermediario',
+    task: 'Monte a área de feed de recrutamento com as especificações:\n1. Construa um elemento pai `<form>`.\n2. Aninhado dentro do formulário, inclua uma tag de agrupamento `<fieldset>`.\n3. O primeiro elemento filho no fieldset deve ser uma legenda `<legend>` exibindo o título "Pesquisa".\n4. Logo abaixo do legend, adicione um `<input>` do tipo "text" com o placeholder "Seu Clã".\n5. Finalize o formulário adicionando um botão de tipo submit `<button type="submit">` com o texto exato "Enviar Opinião".',
+    initialCode: '<!-- Forje o formulário corporativo do clã -->\n',
+    solutionExample: '<form>\n  <fieldset>\n    <legend>Pesquisa</legend>\n    <input type="text" placeholder="Seu Clã" />\n    <button type="submit">Enviar Opinião</button>\n  </fieldset>\n</form>',
+    tests: [
+      { id: 't1', description: 'Deve possuir a tag form principal', ruleType: 'regex', expected: '<form[^>]*>[\\s\\S]*<\\/form>' },
+      { id: 't2', description: 'Deve introduzir agrupamento por fieldset carregando seletor legend contendo "Pesquisa"', ruleType: 'regex', expected: '<fieldset[^>]*>[\\s\\S]*?<legend[^>]*>\\s*Pesquisa\\s*<\\/legend>[\\s\\S]*?<\\/fieldset>' },
+      { id: 't3', description: 'O fieldset deve possuir o input text com placeholder "Seu Clã"', ruleType: 'regex', expected: '<input[^>]*type="text"[^>]*placeholder="Seu Clã"' },
+      { id: 't4', description: 'Deve conter botão de envio submit com o título "Enviar Opinião"', ruleType: 'regex', expected: '<button[^>]*type="submit"[^>]*>\\s*Enviar Opinião\\s*<\\/button>' }
+    ],
+    hint: 'Aninhe corretamente fieldset, legend, input e button dentro da tag form conforme ordenado.',
+    coinsReward: 50,
+    xpReward: 250,
+    order: 12
+  },
+  {
+    id: 'css_ini_6',
+    title: 'Projeto: Botão de Comando do Comandante',
+    description: 'Transforme botões feios e cruéis do sistema operacional em comandos vistosos, profissionais e coloridos usando CSS estruturado!',
+    concept: 'Definindo simultaneamente altura/largura internas (padding), cores sólidas, fontes de destaque e molduras, conferimos às nossas interações identidade polida.',
+    track: 'css',
+    difficulty: 'iniciante',
+    task: 'Estilize as diretivas de layout na classe `.botao-acao` definindo as seguintes configurações:\n1. Uma cor de fundo azul escuro corporativo com o valor `#1e3a8a` (`background-color: #1e3a8a;`).\n2. Cor do texto fixa em branco com o valor `#ffffff` (`color: #ffffff;`).\n3. Preenchimento interno (padding) com `12px` de dimensão vertical e `24px` de dimensão horizontal (`padding: 12px 24px;`).\n4. Uma borda resistente sólida de espessura `2px` com a tonalidade `#475569` (`border: 2px solid #475569;`).',
+    initialCode: '.botao-acao {\n  \n}',
+    solutionExample: '.botao-acao {\n  background-color: #1e3a8a;\n  color: #ffffff;\n  padding: 12px 24px;\n  border: 2px solid #475569;\n}',
+    tests: [
+      { id: 't1', description: 'Deve aplicar a cor do fundo azul escuro #1e3a8a ao botão', ruleType: 'regex', expected: 'background-color\\s*:\\s*#1e3a8a\\s*;' },
+      { id: 't2', description: 'O texto deve ser pintado na cor branca #ffffff', ruleType: 'regex', expected: 'color\\s*:\\s*(#ffffff|white)\\s*;' },
+      { id: 't3', description: 'Deve possuir espaçamento interno padding com 12px de altura e 24px de largura', ruleType: 'regex', expected: 'padding\\s*:\\s*12px\\s+24px\\s*;' },
+      { id: 't4', description: 'Deve declarar a borda de 2px sólida cinza com a cor hexadeciamal #475569', ruleType: 'regex', expected: 'border\\s*:\\s*(2px\\s+solid\\s+#475569|#475569\\s+solid\\s+2px|2px\\s+solid\\s+rgb\\(71,\\s*85,\\s*105\\))' }
+    ],
+    hint: 'Aplique as quatro diretivas dadas em cima da classe .botao-acao com cuidado para fechar cada uma com ponto e vírgula.',
+    coinsReward: 40,
+    xpReward: 200,
+    order: 6
+  },
+  {
+    id: 'css_int_7',
+    title: 'Projeto: Galeria de Aventuras Responsiva',
+    description: 'Estruture o posicionamento centralizado de itens em grade flexível com gap uniforme para simular as principais seções de cartões de portfólios profissionais.',
+    concept: 'O uso conjugado de recursos Flexbox como wrap ao lado de gaps uniformes impede que itens quebrem a margem do navegador e se reorganizem automaticamente.',
+    track: 'css',
+    difficulty: 'intermediario',
+    task: 'Determine e configure as propriedades de estilização da classe `.grade-aventura` respondendo pelas seguintes regras:\n1. Acione o layout flexível (`display: flex;`).\n2. Adicione quebra fluida automática de conteúdo (`flex-wrap: wrap;`).\n3. Ordene o alinhamento centralizado ortogonal de todos os eixos dos elementos filhos (`align-items: center;`).\n4. Forje um distanciamento de lacuna (gap) idêntico por todos os eixos de exatamente `16px` (`gap: 16px;`).',
+    initialCode: '.grade-aventura {\n  \n}',
+    solutionExample: '.grade-aventura {\n  display: flex;\n  flex-wrap: wrap;\n  align-items: center;\n  gap: 16px;\n}',
+    tests: [
+      { id: 't1', description: 'Atribuir display flexível de layout', ruleType: 'regex', expected: 'display\\s*:\\s*flex\\s*;' },
+      { id: 't2', description: 'Habilitar quebra automática flex-wrap como wrap', ruleType: 'regex', expected: 'flex-wrap\\s*:\\s*wrap\\s*;' },
+      { id: 't3', description: 'Alinhar colunas no centro vertical por align-items', ruleType: 'regex', expected: 'align-items\\s*:\\s*center\\s*;' },
+      { id: 't4', description: 'Estabelecer espaçamento de intervalo gap em 16px', ruleType: 'regex', expected: 'gap\\s*:\\s*16px\\s*;' }
+    ],
+    hint: 'Configure o layout flexível aplicando display: flex; flex-wrap: wrap; align-items: center; e o tamanho de gap: 16px; dentro do container.',
+    coinsReward: 50,
+    xpReward: 250,
+    order: 12
+  },
+  {
+    id: 'js_ini_6',
+    title: 'Projeto: Divisor de Recompensas das Masmorras',
+    description: 'Aplique variáveis de controle dinâmico de recursos juntamente com argumentos de funções para gerar relatórios automatizados de saque em moedas!',
+    concept: 'Através de funções JavaScript, podemos orquestrar dados manipulando somas e multiplicações matemáticas ao lado do operador de concatenação de strings.',
+    track: 'js',
+    difficulty: 'iniciante',
+    task: 'Desenvolva uma função declarativa com o nome exato `calcularEspolios(quantidadeInimigos, moedasPorInimigo)`. Ela deve:\n1. Multiplicar a quantidade de inimigos pelas moedas ganhas por cada inimigo e, em seguida, adicionar ao montante uma recompensa fixa bônus de `50` moedas de ouro.\n2. Retornar exatamente a frase estruturada de consolidação: `"Total de moedas: X"`, substituindo "X" pela soma matemática de ouro calculado.',
+    initialCode: 'function calcularEspolios(quantidadeInimigos, moedasPorInimigo) {\n  // Forje a consolidação de moedas e retorne o total\n  \n}',
+    solutionExample: 'function calcularEspolios(quantidadeInimigos, moedasPorInimigo) {\n  const total = (quantidadeInimigos * moedasPorInimigo) + 50;\n  return "Total de moedas: " + total;\n}',
+    tests: [
+      { id: 't1', description: 'Deve declarar a função calcularEspolios com a assinatura e parâmetros requisitados', ruleType: 'regex', expected: 'function\\s+calcularEspolios\\s*\\(\\s*quantidadeInimigos\\s*,\\s*moedasPorInimigo\\s*\\)' },
+      { id: 't2', description: 'Deve calcular o produto dos inputs acrescentando o bônus fixo de 50', ruleType: 'regex', expected: '\\*|\\+.*50|50.*\\+' },
+      { id: 't3', description: 'Deve retornar a string pré-formatada correta concatenando o resultado obtido', ruleType: 'regex', expected: 'return\\s*["\']Total de moedas: ["\']\\s*\\+|return\\s*[`]Total de moedas: \\$\\{' }
+    ],
+    hint: 'Efetue a operação let total = (quantidadeInimigos * moedasPorInimigo) + 50; e finalize com o comando de retorno return "Total de moedas: " + total;',
+    coinsReward: 40,
+    xpReward: 200,
+    order: 6
+  },
+  {
+    id: 'js_int_7',
+    title: 'Projeto: Filtro e Multiplicação de Nível (Filter & Map)',
+    description: 'Demonstre a robustez da engenharia de dados! Combine a filtragem condicional refinada em arrays junto a transformações em lote imutáveis nas listas.',
+    concept: 'Encadear .filter() com o mapeador .map() em cascata é o padrão padrão mais estável para tratar dados que populam tabelas e relatórios de sites comerciais.',
+    track: 'js',
+    difficulty: 'intermediario',
+    task: 'Escreva uma função nomeada `filtrarEDobrarXPs(listaXP)`. Sua lógica operacional interna deve:\n1. Filtrar o array de entrada retendo exclusivamente as frações de XP que forem maiores ou idênticas a `100` (`>= 100`) recorrendo à propriedade `.filter()`.\n2. Do resultado retido, aplique o mapeador `.map()` transformando e duplicando cada numeral de entrada por `2` (`* 2`).\n3. Devolva com o comando de retorno esse novo array imutável totalmente remodelado.',
+    initialCode: 'function filtrarEDobrarXPs(listaXP) {\n  // Retorne os XPs maiores que 100 e duplicados\n  \n}',
+    solutionExample: 'function filtrarEDobrarXPs(listaXP) {\n  return listaXP.filter(xp => xp >= 100).map(xp => xp * 2);\n}',
+    tests: [
+      { id: 't1', description: 'Deve invocar o método filter no array comparando valores >= 100', ruleType: 'regex', expected: '\\.filter\\s*\\([\\s\\S]*?(>=|>=Value)\\s*100[\\s\\S]*?\\)' },
+      { id: 't2', description: 'Deve encadear a transformação map multiplicando cada entrada por 2', ruleType: 'regex', expected: '\\.map\\s*\\([\\s\\S]*?\\*\\s*2[\\s\\S]*?\\)' }
+    ],
+    hint: 'Chame o pipeline contínuo: return listaXP.filter(item => item >= 100).map(item => item * 2);',
+    coinsReward: 50,
+    xpReward: 250,
+    order: 12
   }
 ];
 

@@ -6,15 +6,39 @@
 import React, { useState } from 'react';
 import { Lesson, UserStats, TrackType, LevelType } from '../types';
 import { SYLLABUS } from '../data/syllabus';
-import { Play, Check, Lock, Star, ChevronRight, Award, Compass, Sparkles } from 'lucide-react';
+import { Play, Check, Lock, Star, ChevronRight, Award, Compass, Sparkles, BookOpen, Zap, Code, RefreshCw } from 'lucide-react';
 
 interface MapJourneyProps {
   stats: UserStats;
   onStartLesson: (lesson: Lesson) => void;
 }
 
+const WISDOM_QUOTES = [
+  'HTML Semântico: Nunca use tags apenas pelo tamanho visual (como h1 e h2). Selecione as tags pela hierarquia real de importância da informação.',
+  'Layout Perfeito: O segredo supremo da centralização no CSS está em "display: flex; align-items: center; justify-content: center;". Memorize esta trindade suntuosa!',
+  'Estilo Reutilizável: Mantenha as cores em variáveis customizadas CSS (--main-color) para facilitar manutenções drásticas no futuro com apenas uma linha.',
+  'JavaScript Funcional: Priorize métodos nativos imutáveis como .map(), .filter() e .reduce() sobre estruturas de repetição "for" clássicas e complexas.',
+  'Hábito Vencedor: Dedique pelo menos 15 minutos de prática ativa ao dia (fazendo você mesmo!) em vez de apenas assistir vídeo-aulas passivamente.',
+  'A Arte de Errar: Se o seu código falhar, não mude coisas aleatoriamente. Leia atentamente a mensagem de feedback do console e isole a falha.',
+  'Responsividade Prática: Utilize unidades relativas (rem, %, vh) e evite medidas fixas em pixels (px) nas caixas principais do seu portfólio.',
+  'Imagens Saudáveis: Adicione sempre o atributo "alt" descritivo nas suas tags <img /> para acessibilidade impecável e excelente SEO.',
+  'Organização Semântica: Agrupar campos com <fieldset> e descrevê-los com <legend> gera formulários comerciais altamente responsivos e adaptáveis.',
+  'Otimização de Espaço: Use as tags nativas <details> e <summary> para criar seções expandíveis (FAQs) sem precisar carregar bibliotecas extras de JavaScript!'
+];
+
 export default function MapJourney({ stats, onStartLesson }: MapJourneyProps) {
   const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
+  const [tipTab, setTipTab] = useState<'combate' | 'estudos' | 'html_css_js'>('combate');
+  const [randomWisdom, setRandomWisdom] = useState<string>(WISDOM_QUOTES[0]);
+
+  const handleRandomizeWisdom = () => {
+    const currentIndex = WISDOM_QUOTES.indexOf(randomWisdom);
+    let nextIndex = Math.floor(Math.random() * WISDOM_QUOTES.length);
+    if (nextIndex === currentIndex) {
+      nextIndex = (nextIndex + 1) % WISDOM_QUOTES.length;
+    }
+    setRandomWisdom(WISDOM_QUOTES[nextIndex]);
+  };
 
   // Filter lessons for active track and sort by difficulty (Iniciante -> Intermediário -> Avançado) and order
   const trackLessons = SYLLABUS.filter((l) => l.track === stats.activeTrack);
@@ -194,28 +218,153 @@ export default function MapJourney({ stats, onStartLesson }: MapJourneyProps) {
         })}
       </div>
 
-      {/* RIGHT: Tips & Guidance column */}
-      <div className="space-y-6">
-        {/* Dynamic Tips panel */}
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl text-xs space-y-3 text-slate-300">
-          <h4 className="font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
-            <Sparkles size={14} className="text-amber-400" /> Dicas de Combate
-          </h4>
-          <ul className="space-y-2 text-slate-400 leading-normal pl-4 list-disc">
-            <li>Você pode recarregar as suas vidas ❤️ gastando 50 moedas de ouro no topo.</li>
-            <li>Use o editor de código para testar e depurar a sua lógica ao vivo.</li>
-            <li>Se travar em um desafio avançado, use as dicas 💡 dentro do editor de código. Elas custam apenas 10 Moedas!</li>
-          </ul>
+      {/* RIGHT: Interactive Tips & Educational Guidance Column */}
+      <div className="space-y-5 lg:col-span-1">
+        {/* Interactive Tips Panel */}
+        <div className="bg-slate-900 border border-slate-850 rounded-2xl p-5 shadow-xl space-y-4">
+          <div className="flex items-center gap-1.5 border-b border-slate-800 pb-3">
+            <Sparkles size={16} className="text-amber-400" />
+            <h4 className="font-extrabold text-xs text-white uppercase tracking-wider">
+              Manual de Sabedoria Dev
+            </h4>
+          </div>
+
+          {/* Interactive Navigation Row */}
+          <div className="flex bg-slate-950 p-1 rounded-lg border border-slate-800 gap-1">
+            <button
+              onClick={() => setTipTab('combate')}
+              className={`flex-1 py-1 px-2 rounded-md text-[10px] font-bold transition-all cursor-pointer ${
+                tipTab === 'combate'
+                  ? 'bg-slate-800 text-white shadow-sm'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              🎮 Jogo
+            </button>
+            <button
+              onClick={() => setTipTab('estudos')}
+              className={`flex-1 py-1 px-2 rounded-md text-[10px] font-bold transition-all cursor-pointer ${
+                tipTab === 'estudos'
+                  ? 'bg-slate-800 text-white shadow-sm'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              🧠 Hábitos
+            </button>
+            <button
+              onClick={() => setTipTab('html_css_js')}
+              className={`flex-1 py-1 px-2 rounded-md text-[10px] font-bold transition-all cursor-pointer ${
+                tipTab === 'html_css_js'
+                  ? 'bg-slate-800 text-white shadow-sm'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              💻 Tech Pro
+            </button>
+          </div>
+
+          {/* Content display based on active Tip tab */}
+          <div className="text-slate-300 space-y-3.5 min-h-[140px] animate-fade-in">
+            {tipTab === 'combate' && (
+              <ul className="space-y-3 text-[11px] leading-relaxed">
+                <li className="flex items-start gap-2">
+                  <span className="text-rose-400 mt-0.5">❤️</span>
+                  <div>
+                    <strong className="text-slate-200 block">Gestão das Vidas:</strong>
+                    Suas vidas recarregam sozinhas com tempo ou podem ser restauradas gastando moedas de ouro no botão de coração acima.
+                  </div>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-amber-400 mt-0.5">💡</span>
+                  <div>
+                    <strong className="text-slate-200 block">Dicas de Código (Hints):</strong>
+                    Se travar em um teste rígido, compre uma dica no editor por 10 Moedas para clarear os requisitos.
+                  </div>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-indigo-400 mt-0.5">💾</span>
+                  <div>
+                    <strong className="text-slate-200 block">Salvamento Persistente:</strong>
+                    Seu progresso é gravado localmente de forma segura. Compartilhe ou copie o código de Token no cabeçalho para restaurar em qualquer máquina!
+                  </div>
+                </li>
+              </ul>
+            )}
+
+            {tipTab === 'estudos' && (
+              <ul className="space-y-3 text-[11px] leading-relaxed">
+                <li className="flex items-start gap-2">
+                  <span className="text-emerald-400 mt-0.5">🔄</span>
+                  <div>
+                    <strong className="text-slate-200 block">Estudos Ativos (Recall Ativo):</strong>
+                    Evite apenas colar respostas. Experimente reescrever os códigos manualmente no editor para forjar conexões neurais inabaláveis.
+                  </div>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-sky-400 mt-0.5">🧹</span>
+                  <div>
+                    <strong className="text-slate-200 block">Organização de Código:</strong>
+                    Use o recurso da vassoura limpadora antes de cada submissão para manter a legibilidade das quebras de tag no editor.
+                  </div>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-purple-400 mt-0.5">📖</span>
+                  <div>
+                    <strong className="text-slate-200 block">Aprender com Erros:</strong>
+                    Se a compilação falhar, leia atentamente a listagem de requisitos vermelhos abaixo do editor — ela lhe diz exatamente onde corrigir.
+                  </div>
+                </li>
+              </ul>
+            )}
+
+            {tipTab === 'html_css_js' && (
+              <ul className="space-y-3 text-[11px] leading-relaxed">
+                <li className="flex items-start gap-2">
+                  <span className="text-rose-400 mt-0.5">🌐</span>
+                  <div>
+                    <strong className="text-slate-200 block">Semântica é Ouro:</strong>
+                    tags como <code className="text-rose-300 font-mono bg-rose-950/40 px-1 py-0.2 rounded">&lt;header&gt;</code>, <code className="text-rose-300 font-mono bg-rose-950/40 px-1 py-0.2 rounded">&lt;nav&gt;</code> e <code className="text-rose-300 font-mono bg-rose-950/40 px-1 py-0.2 rounded">&lt;main&gt;</code> superam drasticas divís, tornando seu site responsivo a buscadores e leitores de tela.
+                  </div>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-cyan-400 mt-0.5">🎨</span>
+                  <div>
+                    <strong className="text-slate-200 block">Alinhamento Perfeito:</strong>
+                    Diga adeus a margens fixas confusas. Para centralizar mídias, declare <code className="text-cyan-300 font-mono bg-cyan-950/40 px-1 py-0.2 rounded">display: flex; align-items: center; justify-content: center;</code>.
+                  </div>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-yellow-400 mt-0.5">🧪</span>
+                  <div>
+                    <strong className="text-slate-200 block">Manipulações Imutáveis:</strong>
+                    Dê preferência a mapeadores funcionais <code className="text-yellow-300 font-mono bg-yellow-950/40 px-1 py-0.2 rounded">.map()</code> e <code className="text-yellow-300 font-mono bg-yellow-950/40 px-1 py-0.2 rounded">.filter()</code> para tratar arrays sem induzir falhas em dados primitivos.
+                  </div>
+                </li>
+              </ul>
+            )}
+          </div>
         </div>
 
-        {/* Small encouragement badge */}
-        <div className="bg-gradient-to-br from-slate-900 to-indigo-950/40 border border-[#1e293b] rounded-2xl p-5 shadow-xl text-center space-y-3">
+        {/* Dynamic Oracle Generator Badge */}
+        <div className="bg-gradient-to-br from-slate-900 to-indigo-950/70 border border-slate-800/80 rounded-2xl p-5 shadow-xl text-center space-y-4">
           <div className="w-10 h-10 rounded-full bg-indigo-500/10 text-indigo-400 flex items-center justify-center mx-auto border border-indigo-500/20 text-sm">
-            ✨
+            🔮
           </div>
-          <p className="text-xs text-slate-400 leading-normal">
-            "O programador paciente forja linhas indestrutíveis." Complete as tarefas passo a passo para se tornar um mestre lendário!
-          </p>
+          <div className="space-y-1.5">
+            <h5 className="text-[11px] font-black uppercase text-indigo-300 tracking-wider">
+              Oráculo de Sabedoria de Código
+            </h5>
+            <p className="text-[11px] text-slate-300 italic leading-relaxed bg-slate-950/60 p-3.5 rounded-xl border border-slate-850">
+              "{randomWisdom}"
+            </p>
+          </div>
+          <button
+            onClick={handleRandomizeWisdom}
+            className="w-full py-1.5 px-3 bg-indigo-600 hover:bg-indigo-500 text-white border border-indigo-500/30 rounded-lg text-[10px] font-extrabold uppercase tracking-widest cursor-pointer transition-all active:scale-95 flex items-center justify-center gap-1.5 shadow-md shadow-indigo-600/10"
+          >
+            <RefreshCw size={11} className="animate-spin-slow" />
+            Consular Próxima Dica
+          </button>
         </div>
       </div>
 

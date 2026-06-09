@@ -33,17 +33,17 @@ export default function App() {
   const [stats, setStats] = useState<UserStats>(() => {
     const defaultToken = generateUserToken();
     const defaultStats: UserStats = {
-      xp: 120,
+      xp: 0,
       level: 1,
       hearts: 5,
       maxHearts: 5,
-      coins: 150,
-      streak: 5,
+      coins: 0,
+      streak: 0,
       lastActiveDate: new Date().toISOString(),
       completedLessons: [],
       unlockedAchievements: [],
       activeTrack: 'html',
-      dailyMissions: INITIAL_MISSIONS,
+      dailyMissions: INITIAL_MISSIONS.map(m => ({ ...m, current: 0, completed: false })),
       userToken: defaultToken
     };
 
@@ -316,6 +316,30 @@ export default function App() {
     });
   };
 
+  // Completely reset stats to let user start from scratch (começo do zero)
+  const handleResetStats = () => {
+    if (window.confirm('Aviso: Isso irá apagar todo o seu progresso local de nível, moedas, XP acumulado e lições completadas para que você possa recomeçar o curso do zero! Deseja continuar?')) {
+      const defaultToken = generateUserToken();
+      const freshStats: UserStats = {
+        xp: 0,
+        level: 1,
+        hearts: 5,
+        maxHearts: 5,
+        coins: 0,
+        streak: 0,
+        lastActiveDate: new Date().toISOString(),
+        completedLessons: [],
+        unlockedAchievements: [],
+        activeTrack: 'html',
+        dailyMissions: INITIAL_MISSIONS.map(m => ({ ...m, current: 0, completed: false })),
+        userToken: stats.userToken || defaultToken
+      };
+      setStats(freshStats);
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(freshStats));
+      alert('Seu progresso foi totalmente zerado! Comece a sua jornada de estudos agora do zero. 🚀');
+    }
+  };
+
   // Process success validation
   const handleCodeSuccess = (xpReward: number, coinsReward: number, lessonId: string) => {
     setStats((prev) => {
@@ -479,6 +503,7 @@ export default function App() {
           onSignIn={handleSignIn}
           onSignOut={handleSignOut}
           onLoadToken={loadProgressByToken}
+          onResetStats={handleResetStats}
         />
 
         {/* Tab display routing switcher */}
