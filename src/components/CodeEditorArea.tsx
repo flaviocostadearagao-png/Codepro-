@@ -281,6 +281,10 @@ export default function CodeEditorArea({
   // Handle hint purchase
   const handleBuyHintClick = () => {
     if (hintBought) return;
+    if (stats.coins < 10) {
+      alert('Você não tem moedas suficientes! Custará 10 🪙. Conclua lições ou resgate missões diárias para ganhar mais ouro! 💛');
+      return;
+    }
     const success = onSpendCoins(10);
     if (success) {
       setHintBought(true);

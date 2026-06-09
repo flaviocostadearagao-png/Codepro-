@@ -196,70 +196,96 @@ export default function HeaderBar({
         </div>
 
         {/* Dynamic Status Badges (Streak, Hearts, Gold) */}
-        <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto justify-end">
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:flex lg:flex-row items-stretch gap-3.5 w-full lg:w-auto shrink-0 justify-end">
           
           {/* STREAK */}
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-950 rounded-xl border border-slate-800 shadow-sm">
-            <Flame size={18} className={`${stats.streak > 0 ? 'text-amber-500 animate-pulse' : 'text-slate-500'}`} />
+          <div 
+            className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl border transition-all duration-300 hover:scale-[1.02] select-none ${
+              stats.streak > 0 
+                ? 'bg-amber-500/5 border-amber-500/30 shadow-[0_0_12px_rgba(245,158,11,0.08)]' 
+                : 'bg-slate-950/80 border-slate-800/80'
+            }`}
+            title="Sua sequência de dias consecutivos estudando! Resolva exercícios diariamente para não zerar!"
+          >
+            <div className="relative shrink-0 flex items-center justify-center w-8 h-8 rounded-lg bg-slate-900/90 border border-slate-800">
+              <Flame size={18} className={`${stats.streak > 0 ? 'text-amber-500 animate-pulse' : 'text-slate-600'}`} />
+              {stats.streak > 0 && <span className="absolute -top-1 -right-1 flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span><span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span></span>}
+            </div>
             <div>
-              <div className="text-[10px] text-slate-400 uppercase font-bold tracking-wider leading-none">Ofensiva</div>
-              <div className="text-sm font-extrabold text-white leading-relaxed">{stats.streak} {stats.streak === 1 ? 'Dia' : 'Dias'}</div>
+              <div className="text-[9px] text-slate-400 uppercase font-extrabold tracking-widest leading-none mb-1">Ofensiva</div>
+              <div className={`text-sm font-extrabold leading-none ${stats.streak > 0 ? 'text-amber-400 font-extrabold' : 'text-slate-400'}`}>
+                {stats.streak} {stats.streak === 1 ? 'Dia' : 'Dias'}
+              </div>
             </div>
           </div>
 
           {/* HEARTS */}
-          <div className="flex flex-col sm:flex-row items-center gap-2.5 px-3 py-1.5 bg-slate-950 rounded-xl border border-slate-800 shadow-sm">
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-1">
+          <div 
+            className="flex flex-col sm:flex-row items-center gap-3 px-3.5 py-2 rounded-xl bg-rose-500/5 border border-rose-500/20 hover:border-rose-450/30 hover:shadow-[0_0_12px_rgba(244,63,94,0.06)] transition-all duration-300 hover:scale-[1.02] select-none"
+            title="Sua energia para resolver desafios! Se esgotar, use ouro para se curar ou aguarde recarga."
+          >
+            <div className="flex items-center gap-3.5 w-full sm:w-auto justify-between sm:justify-start">
+              {/* Hearts Icons */}
+              <div className="flex items-center gap-1 shrink-0">
                 {Array.from({ length: stats.maxHearts }).map((_, i) => (
                   <Heart
                     key={i}
                     size={16}
-                    className={`transition-all ${
+                    className={`transition-all duration-300 ${
                       i < stats.hearts
-                        ? 'fill-rose-500 text-rose-500 scale-100 animate-pulse'
-                        : 'text-slate-700 fill-slate-800/50 scale-90'
+                        ? 'fill-rose-500 text-rose-500 scale-100 filter drop-shadow-[0_0_4px_rgba(244,63,94,0.4)] animate-pulse'
+                        : 'text-slate-700 fill-slate-800/40 scale-90'
                     }`}
                   />
                 ))}
               </div>
               
+              {/* Regen Timer */}
               {stats.hearts < stats.maxHearts && countdownText && (
-                <div className="flex items-center gap-1 text-[10px] font-bold text-rose-400 bg-rose-500/10 border border-rose-500/20 px-2 py-0.5 rounded-md shadow-sm select-none" title="Tempo restante até recuperar próxima vida">
-                  <span className="animate-ping w-1.5 h-1.5 rounded-full bg-rose-400 shrink-0 inline-block mr-0.5" />
+                <div className="flex items-center gap-1 text-[9px] font-extrabold text-rose-400 bg-rose-500/10 border border-rose-500/25 px-2 py-0.5 rounded-md shadow-sm select-none shrink-0" title="Tempo restante até recuperar próxima vida">
+                  <span className="animate-ping w-1 h-1 rounded-full bg-rose-400 shrink-0 inline-block mr-0.5" />
                   +❤️ em {countdownText}
                 </div>
               )}
             </div>
             
+            {/* Heal Button */}
             {stats.hearts < stats.maxHearts && (
               <button
                 onClick={handleHealClick}
                 disabled={stats.coins < 50 && stats.hearts > 0}
-                className={`py-1 px-2.5 rounded-lg text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 transition-all cursor-pointer ${
+                className={`py-1 px-3 rounded-lg text-[9px] font-black uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all cursor-pointer h-7 w-full sm:w-auto shrink-0 ${
                   stats.coins >= 50 || stats.hearts === 0
-                    ? 'bg-rose-500/10 text-rose-400 border border-rose-500/30 hover:bg-rose-500 hover:text-white animate-pulse'
-                    : 'bg-slate-900 text-slate-500 border border-slate-800 cursor-not-allowed'
+                    ? 'bg-rose-600 hover:bg-rose-500 text-white border border-rose-500 shadow-md shadow-rose-600/15 active:scale-95'
+                    : 'bg-slate-900 text-slate-500 border border-slate-800 cursor-not-allowed opacity-50'
                 }`}
-                title={stats.hearts === 0 && stats.coins < 50 ? "Obter Bênção de Vida Gratuita" : "Curar corações por 50 moedas de ouro"}
+                title={stats.hearts === 0 && stats.coins < 50 ? "Bênção de Vida Gratuita para continuar programando!" : "Curar corações por 50 moedas"}
               >
                 {healingFeedback ? (
-                  <RefreshCw size={10} className="animate-spin text-emerald-400" />
+                  <RefreshCw size={10} className="animate-spin text-white" />
                 ) : stats.hearts === 0 && stats.coins < 50 ? (
-                  '❤️ Bênção (Grátis!)'
+                  '⚡ Bênção Grátis!'
                 ) : (
-                  '+❤️ (50🪙)'
+                  'Curar (50🪙)'
                 )}
               </button>
             )}
           </div>
 
           {/* COINS (GOLD) */}
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-950 rounded-xl border border-slate-800 shadow-sm hover:border-amber-500/20 transition-all">
-            <span className="text-lg">🪙</span>
+          <div 
+            className="flex items-center gap-3 px-3.5 py-2.5 bg-yellow-500/5 rounded-xl border border-yellow-500/20 hover:border-yellow-400/40 hover:shadow-[0_0_12px_rgba(234,179,8,0.06)] transition-all duration-300 hover:scale-[1.02] select-none"
+            title="Moedas obtidas ao acertar exercícios e missões cotidianas. Use para comprar dicas!"
+          >
+            <div className="shrink-0 flex items-center justify-center w-8 h-8 rounded-lg bg-slate-900/90 border border-slate-800">
+              <span className="text-lg transition-transform duration-300 hover:rotate-12 hover:scale-110">🪙</span>
+            </div>
             <div>
-              <div className="text-[10px] text-slate-400 uppercase font-bold tracking-wider leading-none">Moedas</div>
-              <div className="text-sm font-extrabold text-amber-400 leading-relaxed">{stats.coins}</div>
+              <div className="text-[9px] text-slate-400 uppercase font-extrabold tracking-widest leading-none mb-1">Moedas</div>
+              <div className="text-sm font-extrabold text-amber-400 font-extrabold leading-none flex items-center gap-1">
+                {stats.coins}
+                <span className="text-[10px] text-amber-500/60 font-semibold uppercase tracking-wider">Gold</span>
+              </div>
             </div>
           </div>
 

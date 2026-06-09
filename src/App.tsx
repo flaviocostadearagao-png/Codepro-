@@ -29,6 +29,39 @@ const generateUserToken = (): string => {
   return result;
 };
 
+const validateLoadedStreak = (stats: UserStats): UserStats => {
+  if (!stats) return stats;
+  if (!stats.lastActiveDate) {
+    return {
+      ...stats,
+      streak: 0,
+      lastActiveDate: new Date().toISOString()
+    };
+  }
+  try {
+    const now = new Date();
+    const lastActive = new Date(stats.lastActiveDate);
+
+    // Calculate calendar day difference
+    const tempNow = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const tempLast = new Date(lastActive.getFullYear(), lastActive.getMonth(), lastActive.getDate());
+    
+    const diffTime = tempNow.getTime() - tempLast.getTime();
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays > 1) {
+      // User missed the 1-day window, so they broke the daily chain. Reset streak to 0!
+      return {
+        ...stats,
+        streak: 0
+      };
+    }
+  } catch (e) {
+    console.error('Error validating streak:', e);
+  }
+  return stats;
+};
+
 export default function App() {
   const [stats, setStats] = useState<UserStats>(() => {
     const defaultToken = generateUserToken();
@@ -71,7 +104,7 @@ export default function App() {
         if (!parsed.lastHeartRegenTime) {
           parsed.lastHeartRegenTime = new Date().toISOString();
         }
-        return parsed;
+        return validateLoadedStreak(parsed);
       } catch (e) {
         // use default if parse fails
       }
@@ -135,7 +168,7 @@ export default function App() {
               lastHeartRegenTime: cloudData.lastHeartRegenTime || new Date().toISOString()
             };
             isCurrentStateFromCloud.current = true;
-            setStats(mergedData);
+            setStats(validateLoadedStreak(mergedData));
           } else {
             // First time user registration: save current progress directly as cloud migration
             isCurrentStateFromCloud.current = true;
@@ -158,7 +191,7 @@ export default function App() {
             if (!parsed.userToken) {
               parsed.userToken = generateUserToken();
             }
-            setStats(parsed);
+            setStats(validateLoadedStreak(parsed));
 
             // Fetch latest guest cloud save if exists!
             const userDocRef = doc(db, 'users', parsed.userToken);
@@ -166,7 +199,7 @@ export default function App() {
             if (docSnap.exists()) {
               const cloudData = docSnap.data() as UserStats;
               isCurrentStateFromCloud.current = true;
-              setStats({
+              setStats(validateLoadedStreak({
                 ...cloudData,
                 completedLessons: cloudData.completedLessons || [],
                 unlockedAchievements: cloudData.unlockedAchievements || [],
@@ -175,7 +208,7 @@ export default function App() {
                 avatar: cloudData.avatar || '🥷',
                 nickname: cloudData.nickname || 'Recruta do Código',
                 lastHeartRegenTime: cloudData.lastHeartRegenTime || new Date().toISOString()
-              });
+              }));
             }
           } catch (e) {
             console.error('Error fetching guest data:', e);
@@ -199,15 +232,8 @@ export default function App() {
   useEffect(() => {
     const checkRegen = () => {
       setStats((prev) => {
-        // If already at cap, keep the checkpoint fresh
+        // If already at cap, do nothing to avoid infinite loops and massive Firestore write operations
         if (prev.hearts >= prev.maxHearts) {
-          const nowIso = new Date().toISOString();
-          if (prev.lastHeartRegenTime !== nowIso) {
-            return {
-              ...prev,
-              lastHeartRegenTime: nowIso
-            };
-          }
           return prev;
         }
 
@@ -262,9 +288,10 @@ export default function App() {
           nickname: cloudData.nickname || 'Recruta do Código',
           lastHeartRegenTime: cloudData.lastHeartRegenTime || new Date().toISOString()
         };
+        const validatedData = validateLoadedStreak(mergedData);
         isCurrentStateFromCloud.current = true;
-        setStats(mergedData);
-        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(mergedData));
+        setStats(validatedData);
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(validatedData));
         alert('Progresso recuperado com sucesso da nuvem! ☁️');
       } else {
         alert('Nenhum cadastro encontrado na nuvem para este token de progressão.');
@@ -440,14 +467,50 @@ export default function App() {
         return { ...m, current };
       });
 
+      // Calculate streak update:
+      const now = new Date();
+      let lastActiveIso = prev.lastActiveDate || now.toISOString();
+      let newStreak = prev.streak || 0;
+
+      try {
+        const lastActive = new Date(lastActiveIso);
+        const nowDateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+        const lastActiveDateStr = `${lastActive.getFullYear()}-${String(lastActive.getMonth() + 1).padStart(2, '0')}-${String(lastActive.getDate()).padStart(2, '0')}`;
+
+        if (nowDateStr !== lastActiveDateStr) {
+          // First activity of today!
+          const tempNow = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+          const tempLast = new Date(lastActive.getFullYear(), lastActive.getMonth(), lastActive.getDate());
+          
+          const diffTime = tempNow.getTime() - tempLast.getTime();
+          const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+          if (diffDays === 1) {
+            newStreak = (prev.streak || 0) + 1;
+          } else {
+            newStreak = 1; // fresh start or broke chain
+          }
+          lastActiveIso = now.toISOString();
+        } else {
+          // Ensure they have at least 1 if active today
+          if (newStreak === 0) {
+            newStreak = 1;
+          }
+        }
+      } catch (e) {
+        console.error('Error calculating streak:', e);
+      }
+
       const newCoins = prev.coins + coinsReward;
-      const checkedBadges = checkAchievements(newCompleted, newCoins, prev.streak);
+      const checkedBadges = checkAchievements(newCompleted, newCoins, newStreak);
 
       return {
         ...prev,
         xp: newXP,
         level: newLevel,
         coins: newCoins,
+        streak: newStreak,
+        lastActiveDate: lastActiveIso,
         completedLessons: newCompleted,
         unlockedAchievements: checkedBadges,
         dailyMissions: updatedMissions
