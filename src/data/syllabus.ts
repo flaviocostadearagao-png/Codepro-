@@ -1210,6 +1210,123 @@ export const SYLLABUS: Lesson[] = [
     coinsReward: 50,
     xpReward: 250,
     order: 12
+  },
+  {
+    id: 'html_adv_8',
+    title: 'Gráficos de Vetor Vetorial (Inline SVG)',
+    description: 'Para criar interfaces ultranítidas em qualquer densidade de tela sem carregar arquivos pesados de imagem, desenhe formas geométricas elementares diretamente no código usando marcação SVG.',
+    concept: 'A tag `<svg>` é um contêiner XML para gráficos vetoriais bidimensionais. Elementos como `<circle>` com coordenadas centrais (`cx`, `cy`) e raio (`r`), ou `<rect>` com dimensões (`width`, `height`), definem formas perfeitas e redimensionáveis sem perda de resolução de imagem.',
+    track: 'html',
+    difficulty: 'avancado',
+    task: 'Crie uma runa solar vetorial. Escreva uma tag `<svg>` com largura (width) de "100" e altura (height) de "100". Dentro dela, aninha uma tag `<circle>` com as seguintes propriedades: cx="50", cy="50", r="40" e fill="red".',
+    initialCode: '<!-- Desenhe a runa solar com SVG inline -->\n',
+    solutionExample: '<svg width="100" height="100">\n  <circle cx="50" cy="50" r="40" fill="red" />\n</svg>',
+    tests: [
+      { id: 't1', description: 'Deve conter a tag de abertura e fechamento <svg>', ruleType: 'regex', expected: '<svg[^>]*>[\\s\\S]*<\\/svg>' },
+      { id: 't2', description: 'A tag <svg> deve medir 100 de width e height', ruleType: 'regex', expected: 'width="100"[\\s\\S]*height="100"|height="100"[\\s\\S]*width="100"' },
+      { id: 't3', description: 'Deve conter um elemento <circle> com raio r="40"', ruleType: 'regex', expected: '<circle[^>]*r="40"' },
+      { id: 't4', description: 'O elemento <circle> deve carregar cx="50", cy="50" e cor vermelha (fill="red")', ruleType: 'regex', expected: 'cx="50"[\\s\\S]*cy="50"[\\s\\S]*fill="red"|fill="red"[\\s\\S]*cy="50"[\\s\\S]*cx="50"|cx="50"[\\s\\S]*fill="red"[\\s\\S]*cy="50"' }
+    ],
+    hint: 'Garanta que fechou devidamente as tags <svg> e <circle />, e usou o fechamento auto-fechável para o círculo se preferir.',
+    coinsReward: 60,
+    xpReward: 350,
+    order: 18
+  },
+  {
+    id: 'css_int_8',
+    title: 'Estados Dinâmicos (:hover & :active)',
+    description: 'A interatividade física se destaca nos detalhes. Forje transições suaves de layout para quando o mouse passar por cima ou clicar nos seus botões estruturados.',
+    concept: 'As pseudo-classes de eventos de ponteiro interativo (`:hover` e `:active`) alteram estilos com base em ações do ponteiro. Adicionar `transition` no estado padrão garante que o hover transicione suavemente.',
+    track: 'css',
+    difficulty: 'intermediario',
+    task: 'Estilize o botão definindo as reações do mouse:\n1. Na classe do botão padrão `.botao-reativo`, declare a transição de cor de fundo configurando `transition: background 0.2s linear;`.\n2. Na pseudo-classe de hover `.botao-reativo:hover`, altere a cor de fundo para verde (`background-color: green;`).',
+    initialCode: '.botao-reativo {\n  \n}\n\n.botao-reativo:hover {\n  \n}',
+    solutionExample: '.botao-reativo {\n  transition: background 0.2s linear;\n}\n.botao-reativo:hover {\n  background-color: green;\n}',
+    tests: [
+      { id: 't1', description: 'A classe .botao-reativo deve possuir transition definida', ruleType: 'regex', expected: '\\.botao-reativo\\s*\\{[\\s\\S]*?transition\\s*:\\s*background\\s+0\\.2s\\s+linear' },
+      { id: 't2', description: 'A pseudo-classe .botao-reativo:hover deve mudar o background-color para green', ruleType: 'regex', expected: '\\.botao-reativo:hover\\s*\\{[\\s\\S]*?background-color\\s*:\\s*green' }
+    ],
+    hint: 'Declare a propriedade transition no primeiro bloco e mude a propriedade background-color no seletor :hover.',
+    coinsReward: 50,
+    xpReward: 250,
+    order: 13
+  },
+  {
+    id: 'css_adv_8',
+    title: 'Controle Dimensional Máximo (Box-Sizing)',
+    description: 'Evite quebras inexplicáveis de layout! Quando incluímos paddings e bordas em um elemento, o navegador soma esses tamanhos dilatando o objeto de forma invisível. Mude este comportamento em lote.',
+    concept: 'Aplicar `box-sizing: border-box;` no seletor universal `*` força o navegador a acomodar espaçamentos e bordas no interior das dimensões atribuídas, oferecendo total estabilidade de largura e altura nos layouts modernos.',
+    track: 'css',
+    difficulty: 'avancado',
+    task: 'Configure uma regra de modelo de caixa seguro. Estilize o seletor universal de tags `*` aplicando com maestria a regra de dimensionamento `box-sizing: border-box;`.',
+    initialCode: '/* Estabilize todos os dimensionamentos das caixas */\n',
+    solutionExample: '* {\n  box-sizing: border-box;\n}',
+    tests: [
+      { id: 't1', description: 'Deve estilizar o seletor universal *', ruleType: 'regex', expected: '\\*[\\s\\S]*?\\{' },
+      { id: 't2', description: 'Deve determinar a propriedade box-sizing em border-box', ruleType: 'regex', expected: 'box-sizing\\s*:\\s*border-box\\s*;' }
+    ],
+    hint: 'Use o seletor especial asterisco * e mude box-sizing para border-box para resetar as caixas.',
+    coinsReward: 60,
+    xpReward: 350,
+    order: 18
+  },
+  {
+    id: 'js_int_8',
+    title: 'O Operador Ternário (Escolhas Rápidas)',
+    description: 'Declarações extensas de if-else para tomadas de decisão curtas e atribuições simples de strings parecem lixo visual. Codifique escolhas inline rápidas de forma elegante.',
+    concept: 'O operador condicional ternário utiliza a interrogação e os dois pontos: `condicao ? valorSeVerdadeiro : valorSeFalso`. É ideal para encurtar retornos diretamente em uma única linha.',
+    track: 'js',
+    difficulty: 'intermediario',
+    task: 'Escreva uma função chamada `avaliarNivel(xp)`. Ela deve conter apenas uma linha de execução retornando de forma condicional as seguintes strings:\n- Se o XP for maior ou igual a 1000 (`xp >= 1000`), retorne a string "Veterano".\n- Caso contrário, retorne a string "Recruta".\nUse estritamente a sintaxe do operador ternário (? :).',
+    initialCode: 'function avaliarNivel(xp) {\n  // Forje a decisão rápida em uma única linha\n  \n}',
+    solutionExample: 'function avaliarNivel(xp) {\n  return xp >= 1000 ? "Veterano" : "Recruta";\n}',
+    tests: [
+      { id: 't1', description: 'Deve possuir a assinatura da função avaliarNivel(xp)', ruleType: 'regex', expected: 'function\\s+avaliarNivel\\s*\\(\\s*xp\\s*\\)' },
+      { id: 't2', description: 'Deve retornar os termos Veterano e Recruta usando ternário (? e :)', ruleType: 'regex', expected: '\\?\\s*["\']Veterano["\']\\s*:\\s*["\']Recruta["\']' }
+    ],
+    hint: 'Use return xp >= 1000 ? "Veterano" : "Recruta"; para obter a resposta de primeira.',
+    coinsReward: 50,
+    xpReward: 250,
+    order: 13
+  },
+  {
+    id: 'js_adv_8',
+    title: 'Feitiço Anti-Ruína (Tratamento Try-Catch)',
+    description: 'Aplicações reais falham: quedas de internet, integrações instáveis ou arquivos JSON mal-formados. Proteja seu código crítico evitado travar a tela inteira com escudos try-catch.',
+    concept: 'O bloco `try` gerencia operações estocásticas ou propensas a falha. Se alguma linha de código de risco falhar, o fluxo desvia imediatamente para o bloco `catch(error)` sem interromper os scripts paralelos do navegador.',
+    track: 'js',
+    difficulty: 'avancado',
+    task: 'Crie uma função descritiva `analisarJSON(texto)`. Ela deve:\n1. Tentar decodificar o parâmetro usando `JSON.parse(texto)` dentro de um bloco `try` de abertura e fechamento, retornando o resultado.\n2. Se o dado JSON recebido estiver quebrado, capture a exceção no bloco `catch(error)` retornando a mensagem de aviso: `"Fracasso: "` concatenado diretamente à propriedade `error.message`.',
+    initialCode: 'function analisarJSON(texto) {\n  // Proteja sua aplicação contra formatações quebradas de dados\n  \n}',
+    solutionExample: 'function analisarJSON(texto) {\n  try {\n    return JSON.parse(texto);\n  } catch (error) {\n    return "Fracasso: " + error.message;\n  }\n}',
+    tests: [
+      { id: 't1', description: 'Deve usar bloco try para decodificar JSON.parse', ruleType: 'regex', expected: 'try\\s*\\{[\\s\\S]*?JSON\\.parse\\s*\\(\\s*texto\\s*\\)[\\s\\S]*?\\}\\s*catch\\s*\\(\\s*error\\s*\\)' },
+      { id: 't2', description: 'Deve capturar erro e retornar Fracasso concatenando error.message', ruleType: 'regex', expected: 'return\\s+["\']Fracasso: ["\']\\s*\\+\\s*error\\.message' }
+    ],
+    hint: 'Lembre-se de colocar JSON.parse(texto) dentro do bloco try e retornar a mensagem com error.message na captura do catch.',
+    coinsReward: 60,
+    xpReward: 350,
+    order: 18
+  },
+  {
+    id: 'js_adv_9',
+    title: 'A Forja do Acumulador (Array.reduce)',
+    description: 'Tratar inventários longos combinando laços tradicionais é deselegante e instável. Domine a última joia da programação funcional: reduza matrizes completas a um único dígito consolidado!',
+    concept: 'O acumulador `.reduce(callback, valorInicial)` processa iterativamente arrays retroalimentando uma variável acumuladora consolidada. Seu retorno é imutável e preserva a fonte original intacta.',
+    track: 'js',
+    difficulty: 'avancado',
+    task: 'Desenvolva uma função `somarOuro(listaSacos)`. Ela deve aplicar o redutor `.reduce()` somando todos os numerais contidos no array de sacas e retornar a conta final consolidada, definindo o valor inicial em "0".',
+    initialCode: 'function somarOuro(listaSacos) {\n  // Somar sacas de moedas em um único resultado agregado com .reduce()\n  \n}',
+    solutionExample: 'function somarOuro(listaSacos) {\n  return listaSacos.reduce((soma, sacola) => soma + sacola, 0);\n}',
+    tests: [
+      { id: 't1', description: 'Declarar a função somarOuro recebendo listaSacos', ruleType: 'regex', expected: 'function\\s+somarOuro' },
+      { id: 't2', description: 'Deve acionar o método .reduce() combinando os parâmetros', ruleType: 'regex', expected: '\\.reduce\\s*\\(' },
+      { id: 't3', description: 'Deve inicializar o acumulador com valor base de 0', ruleType: 'regex', expected: '0\\s*\\)' }
+    ],
+    hint: 'Aplique listaSacos.reduce((acumulador, item) => acumulador + item, 0) para fechar o ciclo com chave de ouro!',
+    coinsReward: 60,
+    xpReward: 350,
+    order: 19
   }
 ];
 
