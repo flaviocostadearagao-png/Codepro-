@@ -153,17 +153,17 @@ export default function HeaderBar({
   return (
     <header className="bg-slate-900 border border-slate-800 rounded-2xl p-4 md:p-6 text-slate-100 shadow-xl mb-6">
       {/* Top statistics panel */}
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 pb-6 border-b border-slate-800">
+      <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6 pb-6 border-b border-slate-800">
         
         {/* User Brand & XP */}
-        <div className="flex items-center gap-4 w-full lg:w-auto">
+        <div className="flex items-center gap-4 w-full xl:w-auto">
           <div className="w-14 h-14 rounded-2xl bg-indigo-600 flex items-center justify-center font-bold text-2xl text-white shadow-lg border border-indigo-500 relative shrink-0">
             {stats.level}
             <div className="absolute -bottom-1.5 px-2 py-0.5 bg-slate-950 text-[9px] text-indigo-400 rounded-full font-bold border border-indigo-500/30 uppercase tracking-widest">
               Lvl
             </div>
           </div>
-          <div className="flex-1 lg:flex-initial min-w-[240px]">
+          <div className="flex-1 xl:flex-initial min-w-[240px]">
             <div className="flex flex-col mb-1.5">
               <div className="flex justify-between items-center text-xs font-semibold mb-0.5">
                 <span className="text-slate-200 flex items-center gap-1.5 hover:text-indigo-400 transition-colors cursor-pointer" onClick={() => setShowCustomizer(!showCustomizer)}>
@@ -196,7 +196,7 @@ export default function HeaderBar({
         </div>
 
         {/* Dynamic Status Badges (Streak, Hearts, Gold) */}
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:flex lg:flex-row items-stretch gap-3.5 w-full lg:w-auto shrink-0 justify-end">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:flex xl:flex-row items-stretch gap-3.5 w-full xl:w-auto shrink-0 justify-end">
           
           {/* STREAK */}
           <div 

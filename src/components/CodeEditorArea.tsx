@@ -531,10 +531,10 @@ export default function CodeEditorArea({
   };
 
   return (
-    <div className={`grid grid-cols-1 xl:grid-cols-12 gap-6 bg-slate-950 border border-slate-900 rounded-2xl p-4 md:p-6 shadow-2xl relative ${shakeActive ? 'animate-shake border-rose-500' : ''}`}>
+    <div className={`grid grid-cols-1 lg:grid-cols-12 gap-6 bg-slate-950 border border-slate-900 rounded-2xl p-4 md:p-6 shadow-2xl relative ${shakeActive ? 'animate-shake border-rose-500' : ''}`}>
       
       {/* 1. LEFT SIDEBAR: Instructions & Theory & Tests */}
-      <div className="xl:col-span-4 bg-slate-900 border border-slate-800 rounded-xl p-5 flex flex-col justify-between h-[600px] overflow-y-auto">
+      <div className="lg:col-span-4 bg-slate-900 border border-slate-800 rounded-xl p-5 flex flex-col justify-between h-[600px] overflow-y-auto">
         <div className="space-y-4">
           <div className="space-y-3 bg-slate-950 p-3 rounded-xl border border-slate-850">
             <div className="flex items-center justify-between gap-2">
@@ -666,7 +666,7 @@ export default function CodeEditorArea({
       </div>
 
       {/* 2. CENTER PANEL: Typing code playground */}
-      <div className="xl:col-span-5 bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col justify-between h-[600px]">
+      <div className="lg:col-span-5 bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col justify-between h-[600px]">
         <div className="flex items-center justify-between border-b border-slate-800 pb-3 mb-3">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-rose-500 shadow shadow-rose-500/50" />
@@ -749,7 +749,7 @@ export default function CodeEditorArea({
       </div>
 
       {/* 3. RIGHT SIDEBAR: Live sandbox visual checker */}
-      <div className="xl:col-span-3 bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col justify-between h-[600px]">
+      <div className="lg:col-span-3 bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col justify-between h-[600px]">
         {/* Navigation widgets */}
         <div className="flex bg-slate-950 p-0.5 rounded-lg border border-slate-850 mb-3 font-semibold text-[11px]">
           <button

@@ -29,6 +29,81 @@ const generateUserToken = (): string => {
   return result;
 };
 
+const sanitizeUserStats = (stats: any, fallbackToken: string): UserStats => {
+  const defaultToken = fallbackToken || generateUserToken();
+  const defaultMissions = INITIAL_MISSIONS.map(m => ({ ...m, current: 0, completed: false }));
+
+  if (!stats) {
+    return {
+      xp: 0,
+      level: 1,
+      hearts: 5,
+      maxHearts: 5,
+      coins: 0,
+      streak: 0,
+      lastActiveDate: new Date().toISOString(),
+      completedLessons: [],
+      unlockedAchievements: [],
+      activeTrack: 'html',
+      dailyMissions: defaultMissions,
+      userToken: defaultToken,
+      avatar: '🥷',
+      nickname: 'Recruta do Código',
+      lastHeartRegenTime: new Date().toISOString()
+    };
+  }
+
+  const completed = Array.isArray(stats.completedLessons) ? stats.completedLessons : [];
+  const unlocked = Array.isArray(stats.unlockedAchievements) ? stats.unlockedAchievements : [];
+  
+  // Build a clean, validated missions array
+  let rawMissions = Array.isArray(stats.dailyMissions) ? stats.dailyMissions : [];
+  if (rawMissions.length === 0) {
+    rawMissions = defaultMissions;
+  }
+
+  const sanitizedMissions = INITIAL_MISSIONS.map(initial => {
+    const existing = rawMissions.find((m: any) => m && m.id === initial.id);
+    return {
+      id: initial.id,
+      title: initial.title,
+      description: initial.description,
+      target: initial.target, // always use official target to avoid division by zero or corrupted targets
+      current: existing && typeof existing.current === 'number' && !isNaN(existing.current)
+        ? Math.min(initial.target, Math.max(0, existing.current))
+        : 0,
+      xpReward: initial.xpReward,
+      coinsReward: initial.coinsReward,
+      completed: existing ? !!existing.completed : false
+    };
+  });
+
+  const xpValue = typeof stats.xp === 'number' && !isNaN(stats.xp) ? Math.max(0, stats.xp) : 0;
+  const levelValue = typeof stats.level === 'number' && !isNaN(stats.level) && stats.level > 0 ? stats.level : 1;
+  const coinsValue = typeof stats.coins === 'number' && !isNaN(stats.coins) ? Math.max(0, stats.coins) : 0;
+  const streakValue = typeof stats.streak === 'number' && !isNaN(stats.streak) ? Math.max(0, stats.streak) : 0;
+  const heartsValue = typeof stats.hearts === 'number' && !isNaN(stats.hearts) ? Math.max(0, stats.hearts) : 5;
+  const maxHeartsValue = typeof stats.maxHearts === 'number' && !isNaN(stats.maxHearts) ? Math.max(5, stats.maxHearts) : 5;
+
+  return {
+    xp: xpValue,
+    level: levelValue,
+    hearts: heartsValue,
+    maxHearts: maxHeartsValue,
+    coins: coinsValue,
+    streak: streakValue,
+    lastActiveDate: stats.lastActiveDate || new Date().toISOString(),
+    completedLessons: completed,
+    unlockedAchievements: unlocked,
+    activeTrack: (stats.activeTrack === 'html' || stats.activeTrack === 'css' || stats.activeTrack === 'js') ? stats.activeTrack : 'html',
+    dailyMissions: sanitizedMissions,
+    userToken: stats.userToken || defaultToken,
+    avatar: stats.avatar || '🥷',
+    nickname: stats.nickname || 'Recruta do Código',
+    lastHeartRegenTime: stats.lastHeartRegenTime || new Date().toISOString()
+  };
+};
+
 const validateLoadedStreak = (stats: UserStats): UserStats => {
   if (!stats) return stats;
   if (!stats.lastActiveDate) {
@@ -65,51 +140,17 @@ const validateLoadedStreak = (stats: UserStats): UserStats => {
 export default function App() {
   const [stats, setStats] = useState<UserStats>(() => {
     const defaultToken = generateUserToken();
-    const defaultStats: UserStats = {
-      xp: 0,
-      level: 1,
-      hearts: 5,
-      maxHearts: 5,
-      coins: 0,
-      streak: 0,
-      lastActiveDate: new Date().toISOString(),
-      completedLessons: [],
-      unlockedAchievements: [],
-      activeTrack: 'html',
-      dailyMissions: INITIAL_MISSIONS.map(m => ({ ...m, current: 0, completed: false })),
-      userToken: defaultToken,
-      avatar: '🥷',
-      nickname: 'Recruta do Código',
-      lastHeartRegenTime: new Date().toISOString()
-    };
-
     const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        // Ensure missions array structure exists
-        if (!parsed.dailyMissions || parsed.dailyMissions.length === 0) {
-          parsed.dailyMissions = INITIAL_MISSIONS;
-        }
-        // Ensure backward compatibility with older stored state
-        if (!parsed.userToken) {
-          parsed.userToken = defaultToken;
-        }
-        if (!parsed.avatar) {
-          parsed.avatar = '🥷';
-        }
-        if (!parsed.nickname) {
-          parsed.nickname = 'Recruta do Código';
-        }
-        if (!parsed.lastHeartRegenTime) {
-          parsed.lastHeartRegenTime = new Date().toISOString();
-        }
-        return validateLoadedStreak(parsed);
+        const sanitized = sanitizeUserStats(parsed, defaultToken);
+        return validateLoadedStreak(sanitized);
       } catch (e) {
-        // use default if parse fails
+        // use default on failure
       }
     }
-    return defaultStats;
+    return sanitizeUserStats(null, defaultToken);
   });
 
   const [activeTab, setActiveTab ] = useState<'map' | 'editor' | 'leaderboard' | 'gdd'>('map');
@@ -154,21 +195,10 @@ export default function App() {
           const docSnap = await getDoc(userDocRef);
 
           if (docSnap.exists()) {
-            const cloudData = docSnap.data() as UserStats;
-            // Build stable defaults mapping arrays and nested structures securely
-            const mergedMissions = cloudData.dailyMissions || INITIAL_MISSIONS;
-            const mergedData: UserStats = {
-              ...cloudData,
-              dailyMissions: mergedMissions,
-              completedLessons: cloudData.completedLessons || [],
-              unlockedAchievements: cloudData.unlockedAchievements || [],
-              userToken: cloudData.userToken || stats.userToken,
-              avatar: cloudData.avatar || '🥷',
-              nickname: cloudData.nickname || 'Recruta do Código',
-              lastHeartRegenTime: cloudData.lastHeartRegenTime || new Date().toISOString()
-            };
+            const cloudData = docSnap.data();
+            const sanitized = sanitizeUserStats(cloudData, stats.userToken);
             isCurrentStateFromCloud.current = true;
-            setStats(validateLoadedStreak(mergedData));
+            setStats(validateLoadedStreak(sanitized));
           } else {
             // First time user registration: save current progress directly as cloud migration
             isCurrentStateFromCloud.current = true;
@@ -185,30 +215,18 @@ export default function App() {
         if (saved) {
           try {
             const parsed = JSON.parse(saved);
-            if (!parsed.dailyMissions || parsed.dailyMissions.length === 0) {
-              parsed.dailyMissions = INITIAL_MISSIONS;
-            }
-            if (!parsed.userToken) {
-              parsed.userToken = generateUserToken();
-            }
-            setStats(validateLoadedStreak(parsed));
+            const defaultToken = generateUserToken();
+            const sanitizedLocalStorage = sanitizeUserStats(parsed, defaultToken);
+            setStats(validateLoadedStreak(sanitizedLocalStorage));
 
             // Fetch latest guest cloud save if exists!
-            const userDocRef = doc(db, 'users', parsed.userToken);
+            const userDocRef = doc(db, 'users', sanitizedLocalStorage.userToken);
             const docSnap = await getDoc(userDocRef);
             if (docSnap.exists()) {
-              const cloudData = docSnap.data() as UserStats;
+              const cloudData = docSnap.data();
+              const sanitizedCloud = sanitizeUserStats(cloudData, sanitizedLocalStorage.userToken);
               isCurrentStateFromCloud.current = true;
-              setStats(validateLoadedStreak({
-                ...cloudData,
-                completedLessons: cloudData.completedLessons || [],
-                unlockedAchievements: cloudData.unlockedAchievements || [],
-                dailyMissions: cloudData.dailyMissions || INITIAL_MISSIONS,
-                userToken: cloudData.userToken || parsed.userToken,
-                avatar: cloudData.avatar || '🥷',
-                nickname: cloudData.nickname || 'Recruta do Código',
-                lastHeartRegenTime: cloudData.lastHeartRegenTime || new Date().toISOString()
-              }));
+              setStats(validateLoadedStreak(sanitizedCloud));
             }
           } catch (e) {
             console.error('Error fetching guest data:', e);
@@ -216,10 +234,7 @@ export default function App() {
         } else {
           // completely fresh guest
           const defaultToken = generateUserToken();
-          setStats((prev) => ({
-            ...prev,
-            userToken: defaultToken
-          }));
+          setStats((prev) => sanitizeUserStats({ ...prev, userToken: defaultToken }, defaultToken));
         }
         setAuthLoading(false);
       }
@@ -276,25 +291,22 @@ export default function App() {
       const docSnap = await getDoc(userDocRef);
 
       if (docSnap.exists()) {
-        const cloudData = docSnap.data() as UserStats;
-        const mergedMissions = cloudData.dailyMissions || INITIAL_MISSIONS;
-        const mergedData: UserStats = {
-          ...cloudData,
-          dailyMissions: mergedMissions,
-          completedLessons: cloudData.completedLessons || [],
-          unlockedAchievements: cloudData.unlockedAchievements || [],
-          userToken: cloudData.userToken || token,
-          avatar: cloudData.avatar || '🥷',
-          nickname: cloudData.nickname || 'Recruta do Código',
-          lastHeartRegenTime: cloudData.lastHeartRegenTime || new Date().toISOString()
-        };
-        const validatedData = validateLoadedStreak(mergedData);
+        const cloudData = docSnap.data();
+        const sanitized = sanitizeUserStats(cloudData, token);
+        const validatedData = validateLoadedStreak(sanitized);
         isCurrentStateFromCloud.current = true;
         setStats(validatedData);
         localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(validatedData));
         alert('Progresso recuperado com sucesso da nuvem! ☁️');
       } else {
-        alert('Nenhum cadastro encontrado na nuvem para este token de progressão.');
+        // Create a new token session on-the-fly!
+        const freshStats = sanitizeUserStats({ userToken: token }, token);
+        setStats(freshStats);
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(freshStats));
+        
+        isCurrentStateFromCloud.current = true;
+        await setDoc(userDocRef, freshStats);
+        alert(`O token "${token}" não existia, mas foi registrado e registrado com sucesso como seu novo perfil! Comece sua jornada agora! 🚀`);
       }
     } catch (error) {
       console.error('Erro ao buscar token:', error);
