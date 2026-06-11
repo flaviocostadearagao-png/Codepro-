@@ -68,7 +68,7 @@ export default function LeaderboardPanel({
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 animate-fade-in text-slate-100">
       
       {/* 1. LEFT COLUMN: Global Arena Leaderboard */}
-      <div className="lg:col-span-5 bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col justify-between h-[650px]">
+      <div className="col-span-1 lg:col-span-12 xl:col-span-5 bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col justify-between h-[650px]">
         <div>
           <div className="flex justify-between items-center border-b border-slate-800 pb-4 mb-4">
             <div>
@@ -135,7 +135,7 @@ export default function LeaderboardPanel({
       </div>
 
       {/* 2. RIGHT COLUMN: Daily Quests and Achievements Grid */}
-      <div className="lg:col-span-7 space-y-6">
+      <div className="col-span-1 lg:col-span-12 xl:col-span-7 space-y-6">
         
         {/* DAILY QUESTS BAR */}
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl text-xs space-y-4">

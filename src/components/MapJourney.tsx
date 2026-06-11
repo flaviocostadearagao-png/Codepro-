@@ -107,10 +107,10 @@ export default function MapJourney({ stats, onStartLesson }: MapJourneyProps) {
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fade-in">
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 animate-fade-in">
       
       {/* LEFT: Complete vertical tree list of active track */}
-      <div className="lg:col-span-2 space-y-8 bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+      <div className="col-span-1 lg:col-span-8 space-y-8 bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl text-xs">
         <div className="flex items-center justify-between border-b border-slate-800 pb-4 mb-2">
           <div>
             <h3 className="text-xl font-bold text-white uppercase tracking-wider flex items-center gap-2">
@@ -219,7 +219,7 @@ export default function MapJourney({ stats, onStartLesson }: MapJourneyProps) {
       </div>
 
       {/* RIGHT: Interactive Tips & Educational Guidance Column */}
-      <div className="space-y-5 lg:col-span-1">
+      <div className="space-y-5 col-span-1 lg:col-span-4">
         {/* Interactive Tips Panel */}
         <div className="bg-slate-900 border border-slate-850 rounded-2xl p-5 shadow-xl space-y-4">
           <div className="flex items-center gap-1.5 border-b border-slate-800 pb-3">

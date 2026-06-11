@@ -8,6 +8,95 @@ import { Lesson, UserStats, CodeTest, TrackType, LevelType } from '../types';
 import { Play, RotateCcw, HelpCircle, Eye, Terminal, CheckCircle2, XCircle, ChevronRight, Award, Flame, AlertCircle, ArrowLeft, ArrowRight, Lock, Unlock } from 'lucide-react';
 import { SYLLABUS } from '../data/syllabus';
 
+function checkRegexRule(code: string, expectedPattern: string): boolean {
+  // 1. Direct standard RegExp match
+  try {
+    if (new RegExp(expectedPattern, 'i').test(code)) {
+      return true;
+    }
+  } catch (e) {
+    // ignore
+  }
+
+  // 2. Trailing Semicolons relaxation for CSS & JS lines
+  try {
+    let relaxed = expectedPattern;
+    if (relaxed.endsWith('\\s*;')) {
+      relaxed = relaxed.slice(0, -4) + '\\s*(;|(?=\\s*\\}))';
+    } else if (relaxed.endsWith(';')) {
+      relaxed = relaxed.slice(0, -1) + '(;|(?=\\s*\\}))';
+    }
+    if (new RegExp(relaxed, 'i').test(code)) {
+      return true;
+    }
+  } catch (e) {}
+
+  // 3. Arrow Function and normal function standardizing for JS
+  const funcMatch = expectedPattern.match(/function\\s\+(\w+)\\s\*(?:\\\(|\\\s\*\\\()(.*?)(?:\\\)|\\\s\*\\\))/);
+  if (funcMatch) {
+    const funcName = funcMatch[1];
+    const arrowPattern = `(const|let|var|class)\\s+${funcName}\\s*=\\s*(async\\s+)?(?:\\([^)]*\\)|\\w+)\\s*=>`;
+    try {
+      if (new RegExp(arrowPattern, 'i').test(code)) {
+        return true;
+      }
+    } catch (e) {}
+  }
+
+  // 4. Quotes and template literals normalization (single, double, tick)
+  if (expectedPattern.includes('"') || expectedPattern.includes("'") || expectedPattern.includes('`')) {
+    const quotePattern = expectedPattern
+      .replace(/["']/g, '["\'`]')
+      .replace(/\\s\*\+\\s\*\[`\]/g, '\\s*\\+\\s*["\'`]')
+      .replace(/\[`\]/g, '["\'`]');
+    try {
+      if (new RegExp(quotePattern, 'i').test(code)) {
+        return true;
+      }
+    } catch (e) {}
+  }
+
+  // 5. Commas / parameter spacing variations
+  if (expectedPattern.includes('\\s*,\\s*')) {
+    const commaPattern = expectedPattern.replace(/\\s\*,\\s\*/g, '\\s*,?\\s*');
+    try {
+      if (new RegExp(commaPattern, 'i').test(code)) {
+        return true;
+      }
+    } catch (e) {}
+  }
+
+  // Backwards or alternative multiplication check
+  const multMatch = expectedPattern.match(/(\w+)\\s\*\\\*\\s\*(\w+)/);
+  if (multMatch) {
+    const var1 = multMatch[1];
+    const var2 = multMatch[2];
+    const altMult = `${var2}\\s*\\*\\s*${var1}`;
+    try {
+      if (new RegExp(altMult, 'i').test(code)) {
+        return true;
+      }
+    } catch (e) {}
+  }
+
+  // 6. Else structure return clause - relaxation
+  if (expectedPattern.includes('else\\s*\\{') || expectedPattern.includes('else\\s*')) {
+    const terms = ["Avançar", "avancar", "Recuar", "recuar"];
+    for (const term of terms) {
+      if (expectedPattern.toLowerCase().includes(term.toLowerCase())) {
+        const altReturn = `return\\s*["'\`]${term}["'\`]`;
+        try {
+          if (new RegExp(altReturn, 'i').test(code)) {
+            return true;
+          }
+        } catch (e) {}
+      }
+    }
+  }
+
+  return false;
+}
+
 interface CodeEditorAreaProps {
   stats: UserStats;
   activeLesson: Lesson | null;
@@ -39,6 +128,53 @@ export default function CodeEditorArea({
 
   // Iframe ref for HTML/CSS preview
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const handleInsertShortcut = (snippet: string) => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const currentVal = code;
+
+    const newVal = currentVal.substring(0, start) + snippet + currentVal.substring(end);
+    setCode(newVal);
+
+    // Focus back and set cursor position
+    setTimeout(() => {
+      textarea.focus();
+      // Calculate a smart cursor placement offset
+      let offset = snippet.length;
+      if (snippet.endsWith('">')) {
+        offset = snippet.length - 2;
+      } else if (snippet.includes('=""')) {
+        offset = snippet.indexOf('=""') + 2; 
+      } else if (snippet.includes('()')) {
+        offset = snippet.indexOf('()') + 1;
+      } else if (snippet.includes('{}')) {
+        offset = snippet.indexOf('{}') + 1;
+      } else if (snippet.startsWith('<') && snippet.endsWith('>') && !snippet.startsWith('</') && !snippet.endsWith('/>')) {
+        offset = snippet.length;
+      }
+
+      textarea.selectionStart = textarea.selectionEnd = start + offset;
+    }, 0);
+  };
+
+  const trackShortcuts: Record<string, string[]> = {
+    html: [
+      '<div>', '</div>', '<h1>', '</h1>', '<p>', '</p>', '<img />', '<canvas id="game-stage">', '<svg>', '</svg>', '<circle>', '<picture>', '<source>', 'class=""', 'id=""', 'width="150"'
+    ],
+    css: [
+      'display: grid;', 'grid-template-areas:', 'aspect-ratio: 16/9;', '@media (max-width: 600px)', '@keyframes pulsar', 'animation: pulsar 1.5s;', 'background-color: ', 'border-color: ', 'height: 100dvh;', 'var(--cor-mana, blue)'
+    ],
+    js: [
+      'function ', 'async function ', 'await ', 'return ', 'const { ouro, gemas } = bau;', '[...mochilaA]', '.reduce()', '.filter()', 'error.message', 'Promise.all()'
+    ]
+  };
+
+  const shortcutsToRender = trackShortcuts[activeLesson?.track || 'html'] || [];
 
   // Filter and sort active track lessons
   const trackLessons = activeLesson ? SYLLABUS.filter((l) => l.track === activeLesson.track) : [];
@@ -501,7 +637,7 @@ export default function CodeEditorArea({
         passed = false;
       } else {
         if (test.ruleType === 'regex') {
-          passed = new RegExp(test.expected, 'i').test(code);
+          passed = checkRegexRule(code, test.expected);
         } else if (test.ruleType === 'contains') {
           passed = code.toLowerCase().includes(test.expected.toLowerCase());
         } else if (test.ruleType === 'not_contains') {
@@ -534,7 +670,7 @@ export default function CodeEditorArea({
     <div className={`grid grid-cols-1 lg:grid-cols-12 gap-6 bg-slate-950 border border-slate-900 rounded-2xl p-4 md:p-6 shadow-2xl relative ${shakeActive ? 'animate-shake border-rose-500' : ''}`}>
       
       {/* 1. LEFT SIDEBAR: Instructions & Theory & Tests */}
-      <div className="lg:col-span-4 bg-slate-900 border border-slate-800 rounded-xl p-5 flex flex-col justify-between h-[600px] overflow-y-auto">
+      <div className="col-span-1 lg:col-span-5 xl:col-span-4 bg-slate-900 border border-slate-800 rounded-xl p-5 flex flex-col justify-between h-[500px] lg:h-[550px] xl:h-[600px] overflow-y-auto">
         <div className="space-y-4">
           <div className="space-y-3 bg-slate-950 p-3 rounded-xl border border-slate-850">
             <div className="flex items-center justify-between gap-2">
@@ -666,7 +802,7 @@ export default function CodeEditorArea({
       </div>
 
       {/* 2. CENTER PANEL: Typing code playground */}
-      <div className="lg:col-span-5 bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col justify-between h-[600px]">
+      <div className="col-span-1 lg:col-span-7 xl:col-span-5 bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col justify-between h-[500px] lg:h-[550px] xl:h-[600px]">
         <div className="flex items-center justify-between border-b border-slate-800 pb-3 mb-3">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-rose-500 shadow shadow-rose-500/50" />
@@ -706,6 +842,25 @@ export default function CodeEditorArea({
           </div>
         </div>
 
+        {/* Shortcuts and suggestions panel above the editor */}
+        <div className="mb-2 bg-slate-950 p-2 rounded-lg border border-slate-850 flex flex-col gap-1 select-none">
+          <div className="flex items-center justify-between text-[10px] text-indigo-400 font-extrabold uppercase tracking-wider">
+            <span className="flex items-center gap-1">⚡ Atalhos de Produtividade:</span>
+            <span className="hidden sm:inline text-slate-500 font-normal normal-case">Clique para inserir no cursor</span>
+          </div>
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-thin">
+            {shortcutsToRender.map((sc, i) => (
+              <button
+                key={i}
+                onClick={() => handleInsertShortcut(sc)}
+                className="px-2.5 py-1 bg-slate-900 border border-slate-800 hover:border-indigo-500/40 text-[10px] text-slate-300 hover:text-white rounded font-mono whitespace-nowrap transition-all active:scale-95 cursor-pointer"
+              >
+                {sc}
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* The code IDE editable zone */}
         <div className="flex-1 w-full bg-slate-950 rounded-lg p-3 border border-slate-850 flex font-mono text-xs relative overflow-hidden group">
           {/* Code line numbers */}
@@ -716,8 +871,62 @@ export default function CodeEditorArea({
           </div>
 
           <textarea
+            ref={textareaRef}
             value={code}
             onChange={(e) => setCode(e.target.value)}
+            onKeyDown={(e) => {
+              const textarea = e.currentTarget;
+              const start = textarea.selectionStart;
+              const end = textarea.selectionEnd;
+              const currentVal = code;
+
+              const pairs: Record<string, string> = {
+                '{': '}',
+                '(': ')',
+                '[': ']',
+                '"': '"',
+                "'": "'",
+                '`': '`'
+              };
+
+              if (pairs[e.key] !== undefined) {
+                e.preventDefault();
+                const closingChar = pairs[e.key];
+                const newVal = currentVal.substring(0, start) + e.key + closingChar + currentVal.substring(end);
+                setCode(newVal);
+                // set cursor position inside the pair
+                setTimeout(() => {
+                  textarea.selectionStart = textarea.selectionEnd = start + 1;
+                }, 0);
+              } else if (e.key === 'Tab') {
+                e.preventDefault();
+                const newVal = currentVal.substring(0, start) + '  ' + currentVal.substring(end);
+                setCode(newVal);
+                setTimeout(() => {
+                  textarea.selectionStart = textarea.selectionEnd = start + 2;
+                }, 0);
+              } else if (e.key === '>') {
+                // Auto-close open tag
+                const lastLt = currentVal.lastIndexOf('<', start - 1);
+                if (lastLt !== -1 && lastLt > currentVal.lastIndexOf('>', start - 1)) {
+                  const tagContent = currentVal.substring(lastLt + 1, start);
+                  const tagNameMatch = tagContent.match(/^([a-zA-Z1-6-]+)/);
+                  if (tagNameMatch && !tagContent.endsWith('/') && !tagContent.startsWith('/')) {
+                    const tagName = tagNameMatch[1];
+                    const voidTags = ['img', 'br', 'input', 'hr', 'meta', 'source', 'link'];
+                    if (!voidTags.includes(tagName)) {
+                      e.preventDefault();
+                      const closingTag = `></${tagName}>`;
+                      const newVal = currentVal.substring(0, start) + closingTag + currentVal.substring(end);
+                      setCode(newVal);
+                      setTimeout(() => {
+                        textarea.selectionStart = textarea.selectionEnd = start + 1;
+                      }, 0);
+                    }
+                  }
+                }
+              }
+            }}
             className="flex-1 bg-transparent text-slate-100 pl-3 focus:outline-none resize-none font-mono text-xs overflow-y-auto leading-relaxed h-full whitespace-pre"
             spellCheck="false"
             placeholder="Digite o código para o desafio..."
@@ -749,7 +958,7 @@ export default function CodeEditorArea({
       </div>
 
       {/* 3. RIGHT SIDEBAR: Live sandbox visual checker */}
-      <div className="lg:col-span-3 bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col justify-between h-[600px]">
+      <div className="col-span-1 lg:col-span-12 xl:col-span-3 bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col justify-between h-[450px] lg:h-[350px] xl:h-[600px]">
         {/* Navigation widgets */}
         <div className="flex bg-slate-950 p-0.5 rounded-lg border border-slate-850 mb-3 font-semibold text-[11px]">
           <button
