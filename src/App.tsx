@@ -13,11 +13,6 @@ import LeaderboardPanel from './components/LeaderboardPanel';
 import ManualTabs from './components/ManualTabs';
 import { Sparkles, Trophy, Award, Heart, HelpCircle, GraduationCap } from 'lucide-react';
 
-// Firebase core integration imports
-import { onAuthStateChanged, User as FirebaseUser, signInWithPopup, signOut } from 'firebase/auth';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { auth, db, googleProvider, handleFirestoreError, OperationType } from './firebase';
-
 const LOCAL_STORAGE_KEY = 'codequest_user_stats_v2';
 
 const generateUserToken = (): string => {
@@ -191,97 +186,16 @@ export default function App() {
     }
   }, [activeTab, stats.activeTrack, stats.completedLessons, activeLesson]);
 
-  // Auth synchronization tracking states
-  const [user, setUser] = useState<FirebaseUser | null>(null);
-  const [authLoading, setAuthLoading] = useState(true);
-  const isCurrentStateFromCloud = useRef(false);
-
-  // Sync state changes to matching repository (localStorage fallback AND cloud Firestore)
+  // Sync state changes to matching repository (localStorage)
   useEffect(() => {
-    // Local copy is always updated as a safe fallback
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(stats));
-
-    if (isCurrentStateFromCloud.current) {
-      isCurrentStateFromCloud.current = false;
-      return; // prevent rewriting exact data just pulled from Firestore
-    }
-
-    // Determine path ID to write to based on login state (Google UID or unique Guest token)
-    const activeDocId = user ? user.uid : stats.userToken;
-
-    if (activeDocId) {
-      const userDocRef = doc(db, 'users', activeDocId);
-      setDoc(userDocRef, stats)
-        .catch((error) => {
-          handleFirestoreError(error, OperationType.WRITE, `users/${activeDocId}`);
-        });
-    }
-  }, [stats, user]);
-
-  // Handle Firebase auth validation transitions
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      setUser(currentUser);
-      if (currentUser) {
-        setAuthLoading(true);
-        try {
-          const userDocRef = doc(db, 'users', currentUser.uid);
-          const docSnap = await getDoc(userDocRef);
-
-          if (docSnap.exists()) {
-            const cloudData = docSnap.data();
-            const sanitized = sanitizeUserStats(cloudData, stats.userToken);
-            isCurrentStateFromCloud.current = true;
-            setStats(validateLoadedStreak(sanitized));
-          } else {
-            // First time user registration: save current progress directly as cloud migration
-            isCurrentStateFromCloud.current = true;
-            await setDoc(userDocRef, stats);
-          }
-        } catch (error) {
-          handleFirestoreError(error, OperationType.GET, `users/${currentUser.uid}`);
-        } finally {
-          setAuthLoading(false);
-        }
-      } else {
-        // Fallback to local machine state if logged-out
-        const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
-        if (saved) {
-          try {
-            const parsed = JSON.parse(saved);
-            const defaultToken = generateUserToken();
-            const sanitizedLocalStorage = sanitizeUserStats(parsed, defaultToken);
-            setStats(validateLoadedStreak(sanitizedLocalStorage));
-
-            // Fetch latest guest cloud save if exists!
-            const userDocRef = doc(db, 'users', sanitizedLocalStorage.userToken);
-            const docSnap = await getDoc(userDocRef);
-            if (docSnap.exists()) {
-              const cloudData = docSnap.data();
-              const sanitizedCloud = sanitizeUserStats(cloudData, sanitizedLocalStorage.userToken);
-              isCurrentStateFromCloud.current = true;
-              setStats(validateLoadedStreak(sanitizedCloud));
-            }
-          } catch (e) {
-            console.error('Error fetching guest data:', e);
-          }
-        } else {
-          // completely fresh guest
-          const defaultToken = generateUserToken();
-          setStats((prev) => sanitizeUserStats({ ...prev, userToken: defaultToken }, defaultToken));
-        }
-        setAuthLoading(false);
-      }
-    });
-
-    return () => unsubscribe();
-  }, []);
+  }, [stats]);
 
   // Passive Heart Regeneration check (adds 1 heart every 1 hour)
   useEffect(() => {
     const checkRegen = () => {
       setStats((prev) => {
-        // If already at cap, do nothing to avoid infinite loops and massive Firestore write operations
+        // If already at cap, do nothing to avoid infinite loops and unnecessary updates
         if (prev.hearts >= prev.maxHearts) {
           return prev;
         }
@@ -311,62 +225,6 @@ export default function App() {
     const interval = setInterval(checkRegen, 10000); // Verify every 10 seconds
     return () => clearInterval(interval);
   }, [stats.hearts, stats.maxHearts]);
-
-  const loadProgressByToken = async (token: string) => {
-    token = token.trim().toUpperCase();
-    if (!token.startsWith('CQ-') || token.length < 5) {
-      alert('Token inválido. O token deve começar com "CQ-"');
-      return;
-    }
-
-    setAuthLoading(true);
-    try {
-      const userDocRef = doc(db, 'users', token);
-      const docSnap = await getDoc(userDocRef);
-
-      if (docSnap.exists()) {
-        const cloudData = docSnap.data();
-        const sanitized = sanitizeUserStats(cloudData, token);
-        const validatedData = validateLoadedStreak(sanitized);
-        isCurrentStateFromCloud.current = true;
-        setStats(validatedData);
-        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(validatedData));
-        alert('Progresso recuperado com sucesso da nuvem! ☁️');
-      } else {
-        // Create a new token session on-the-fly!
-        const freshStats = sanitizeUserStats({ userToken: token }, token);
-        setStats(freshStats);
-        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(freshStats));
-        
-        isCurrentStateFromCloud.current = true;
-        await setDoc(userDocRef, freshStats);
-        alert(`O token "${token}" não existia, mas foi registrado e registrado com sucesso como seu novo perfil! Comece sua jornada agora! 🚀`);
-      }
-    } catch (error) {
-      console.error('Erro ao buscar token:', error);
-      alert('Falha ao carregar progresso da nuvem. Verifique o seu console.');
-    } finally {
-      setAuthLoading(false);
-    }
-  };
-
-  const handleSignIn = async () => {
-    try {
-      await signInWithPopup(auth, googleProvider);
-    } catch (error) {
-      console.error('Erro de login Google:', error);
-    }
-  };
-
-  const handleSignOut = async () => {
-    try {
-      if (window.confirm('Deseja desconectar sua conta da nuvem? Seu progresso do computador atual continuará disponível localmente.')) {
-        await signOut(auth);
-      }
-    } catch (error) {
-      console.error('Erro de logout:', error);
-    }
-  };
 
   // Badge unlock helper
   const checkAchievements = (completed: string[], coins: number, streak: number): string[] => {
@@ -651,11 +509,6 @@ export default function App() {
             setActiveTab={setActiveTab}
             onHeal={handleHeal}
             onSelectTrack={handleSelectTrack}
-            user={user}
-            authLoading={authLoading}
-            onSignIn={handleSignIn}
-            onSignOut={handleSignOut}
-            onLoadToken={loadProgressByToken}
             onResetStats={handleResetStats}
             onUpdateStats={(updatedFields) => setStats(prev => ({ ...prev, ...updatedFields }))}
           />

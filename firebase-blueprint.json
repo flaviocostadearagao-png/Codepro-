@@ -16,9 +16,12 @@
         "unlockedAchievements": { "type": "array", "description": "List of unlocked achievement IDs" },
         "activeTrack": { "type": "string", "enum": ["html", "css", "js"], "description": "Currently active learning track" },
         "dailyMissions": { "type": "array", "description": "List of active daily missions" },
-        "userToken": { "type": "string", "description": "Unique access token for automatic cloud saving" }
+        "userToken": { "type": "string", "description": "Unique access token for automatic cloud saving" },
+        "avatar": { "type": "string", "description": "User's current character avatar" },
+        "nickname": { "type": "string", "description": "User's public display nickname" },
+        "lastHeartRegenTime": { "type": "string", "description": "Last time the user's hearts regenerations were processed" }
       },
-      "required": ["xp", "level", "hearts", "maxHearts", "coins", "streak", "lastActiveDate", "completedLessons", "unlockedAchievements", "activeTrack", "dailyMissions", "userToken"]
+      "required": ["xp", "level", "hearts", "maxHearts", "coins", "streak", "lastActiveDate", "completedLessons", "unlockedAchievements", "activeTrack", "dailyMissions", "userToken", "avatar", "nickname", "lastHeartRegenTime"]
     }
   },
   "firestore": {

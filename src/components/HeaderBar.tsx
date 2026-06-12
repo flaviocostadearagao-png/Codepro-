@@ -5,8 +5,7 @@
 
 import React, { useState } from 'react';
 import { UserStats, TrackType } from '../types';
-import { Flame, Heart, Award, Sparkles, Swords, RefreshCw, Cloud, LogOut, RotateCcw } from 'lucide-react';
-import { User } from 'firebase/auth';
+import { Flame, Heart, Award, Sparkles, Swords, RefreshCw, RotateCcw, Download, Upload } from 'lucide-react';
 import { SYLLABUS } from '../data/syllabus';
 
 interface HeaderBarProps {
@@ -15,11 +14,6 @@ interface HeaderBarProps {
   setActiveTab: (tab: 'map' | 'editor' | 'leaderboard' | 'gdd') => void;
   onHeal: () => void;
   onSelectTrack: (track: TrackType) => void;
-  user: User | null;
-  authLoading: boolean;
-  onSignIn: () => void;
-  onSignOut: () => void;
-  onLoadToken: (token: string) => void;
   onResetStats: () => void;
   onUpdateStats?: (newStats: Partial<UserStats>) => void;
 }
@@ -43,17 +37,11 @@ export default function HeaderBar({
   setActiveTab,
   onHeal,
   onSelectTrack,
-  user,
-  authLoading,
-  onSignIn,
-  onSignOut,
-  onLoadToken,
   onResetStats,
   onUpdateStats
 }: HeaderBarProps) {
   const [healingFeedback, setHealingFeedback] = useState(false);
   const [copiedFeedback, setCopiedFeedback] = useState(false);
-  const [inputToken, setInputToken] = useState('');
 
   const [showCustomizer, setShowCustomizer] = useState(false);
   const [tempNickname, setTempNickname] = useState(stats.nickname || 'Recruta do Código');
@@ -162,16 +150,7 @@ export default function HeaderBar({
             className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-600 to-indigo-800 hover:from-indigo-500 hover:to-indigo-700 flex items-center justify-center shadow-lg border border-indigo-550 relative shrink-0 transition-all hover:scale-105 active:scale-95 cursor-pointer focus:outline-none"
             title="Clique para personalizar seu herói!"
           >
-            {user?.photoURL ? (
-              <img
-                src={user.photoURL}
-                className="w-full h-full rounded-2xl object-cover p-0.5"
-                alt="Avatar"
-                referrerPolicy="no-referrer"
-              />
-            ) : (
-              <span className="text-3xl select-none leading-none mt-[-2px]">{stats.avatar || '🥷'}</span>
-            )}
+            <span className="text-3xl select-none leading-none mt-[-2px]">{stats.avatar || '🥷'}</span>
             <div className="absolute -bottom-1.5 px-2 py-0.5 bg-slate-950 text-[10px] text-indigo-400 rounded-full font-bold border border-indigo-500/30 uppercase tracking-widest leading-none whitespace-nowrap shadow-md">
               Lvl {stats.level}
             </div>
@@ -301,42 +280,12 @@ export default function HeaderBar({
             </div>
           </div>
 
-          {/* CLOUD SAVE AUTH */}
+          {/* LOCAL SAVE ACTIVE STATUS */}
           <div className="flex items-center gap-2 shrink-0 border-t sm:border-t-0 md:border-l border-slate-800 pt-2 sm:pt-0 md:pl-3 md:ml-1 h-9 w-full sm:w-auto justify-end">
-            {authLoading ? (
-              <div className="flex items-center gap-2 text-xs text-slate-500 font-medium whitespace-nowrap">
-                <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-ping" />
-                Sincronizando...
-              </div>
-            ) : user ? (
-              <div className="flex items-center gap-2 bg-indigo-500/10 border border-indigo-500/20 rounded-xl p-1 px-2.5">
-                <img
-                  src={user.photoURL || `https://api.dicebear.com/7.x/pixel-art/svg?seed=${user.displayName || 'player'}`}
-                  className="w-6 h-6 rounded-full border border-indigo-500/40 shrink-0"
-                  alt="Avatar"
-                  referrerPolicy="no-referrer"
-                />
-                <div className="text-left hidden sm:block max-w-[100px]">
-                  <p className="text-[10px] font-bold text-white truncate leading-none">{user.displayName || 'Mestre'}</p>
-                  <p className="text-[8px] text-emerald-400 font-semibold leading-none mt-0.5">Nuvem ☁️</p>
-                </div>
-                <button
-                  onClick={onSignOut}
-                  className="p-1 hover:bg-rose-500/20 rounded-lg text-slate-400 hover:text-rose-400 cursor-pointer transition-all active:scale-95"
-                  title="Desconectar do Cloud"
-                >
-                  <LogOut size={13} />
-                </button>
-              </div>
-            ) : (
-              <button
-                onClick={onSignIn}
-                className="p-1.5 px-3 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-lg text-[10px] font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 cursor-pointer shadow-md active:scale-[0.98] transition-all border border-indigo-500/30 whitespace-nowrap animate-scale-in"
-                title="Salve o seu progresso na nuvem usando a sua conta Google"
-              >
-                <Cloud size={11} className="animate-pulse text-indigo-200" /> Sincronizar Nuvem
-              </button>
-            )}
+            <div className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-1 px-2.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+              <span className="text-[10px] text-emerald-450 font-extrabold uppercase tracking-widest select-none leading-none">Salvo no Navegador</span>
+            </div>
           </div>
 
         </div>
@@ -436,51 +385,66 @@ export default function HeaderBar({
         </div>
       </div>
 
-      {/* UNIQUE USER TOKEN & AUTOMATIC SAVE STATUS BAR */}
-      <div className="mt-4 p-3 bg-slate-950 rounded-xl border border-slate-800/80 flex flex-col md:flex-row items-center justify-between gap-3 text-xs">
+      {/* LOCAL BACKUP & RESTORE TOOLS */}
+      <div className="mt-4 p-3 bg-slate-950 rounded-xl border border-slate-855 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
         <div className="flex flex-wrap items-center gap-2 text-slate-300">
-          <span className="font-bold text-amber-400">🔑 Token de Progresso Único:</span>
-          <span className="font-mono bg-slate-900 border border-slate-800 px-2 py-0.5 rounded text-white font-extrabold select-all tracking-wider text-[11px]">
-            {stats.userToken || 'Gerando...'}
-          </span>
-          <button
-            onClick={() => {
-              if (stats.userToken) {
-                navigator.clipboard.writeText(stats.userToken);
-                setCopiedFeedback(true);
-                setTimeout(() => setCopiedFeedback(false), 2000);
-              }
-            }}
-            className="p-1 px-2.5 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 select-none hover:text-indigo-300 rounded border border-indigo-500/20 text-[10px] font-bold uppercase cursor-pointer transition-all active:scale-95"
-          >
-            {copiedFeedback ? 'Copiado! ✅' : 'Copiar'}
-          </button>
-          <span className="text-[10px] text-emerald-400 font-semibold flex items-center gap-1 ml-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
-            Progresso Salvo Automaticamente na Nuvem ☁️
-          </span>
+          <span className="font-extrabold text-indigo-400 flex items-center gap-1">💾 Backup do Guerreiro:</span>
+          <span className="text-slate-405">Exporte seu arquivo de salvamento para guardar sua jornada ou jogar em outro computador!</span>
         </div>
-
-        {/* Load backup token form */}
-        <div className="flex items-center gap-1.5 w-full md:w-auto">
-          <input
-            type="text"
-            placeholder="Carregar Token (ex: CQ-XXXXXX)"
-            value={inputToken}
-            onChange={(e) => setInputToken(e.target.value)}
-            className="p-1 px-2.5 text-[10px] font-mono rounded bg-slate-900 border border-slate-800 text-slate-200 placeholder-slate-500 uppercase tracking-widest focus:outline-none focus:border-indigo-500 w-full md:w-48 h-8"
-          />
+        
+        <div className="flex items-center gap-2.5 self-end sm:self-auto shrink-0">
           <button
             onClick={() => {
-              if (inputToken.trim()) {
-                onLoadToken(inputToken);
-                setInputToken('');
+              try {
+                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(stats, null, 2));
+                const downloadAnchor = document.createElement('a');
+                downloadAnchor.setAttribute("href", dataStr);
+                downloadAnchor.setAttribute("download", `codequest-backup-Lvl${stats.level}-${(stats.nickname || 'viking').replace(/\s+/g, '-').toLowerCase()}.json`);
+                document.body.appendChild(downloadAnchor);
+                downloadAnchor.click();
+                downloadAnchor.remove();
+              } catch (e) {
+                alert("Erro ao exportar backup.");
               }
             }}
-            className="p-1 px-3 bg-slate-800 hover:bg-slate-755 text-white rounded text-[10px] font-bold uppercase border border-slate-700 cursor-pointer transition-all active:scale-95 shrink-0 h-8"
+            className="p-2 px-3.5 bg-indigo-650 hover:bg-indigo-600 border border-indigo-500/20 text-white rounded-lg text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer shadow-md"
+            title="Download do arquivo JSON com todo seu progresso"
           >
-            Carregar
+            <Download size={12} /> Exportar Progresso
           </button>
+          
+          <label
+            className="p-2 px-3.5 bg-slate-850 hover:bg-slate-800 border border-slate-750 text-slate-300 rounded-lg text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer shadow-md select-none"
+            title="Carregar arquivo JSON exportado anteriormente"
+          >
+            <Upload size={12} /> Importar Progresso
+            <input
+              type="file"
+              accept=".json"
+              className="hidden"
+              onChange={(e) => {
+                const fileReader = new FileReader();
+                if (e.target.files && e.target.files[0]) {
+                  fileReader.readAsText(e.target.files[0], "UTF-8");
+                  fileReader.onload = (event) => {
+                    try {
+                      const parsed = JSON.parse(event.target?.result as string);
+                      if (parsed && typeof parsed === 'object' && ('xp' in parsed || 'level' in parsed)) {
+                        if (onUpdateStats) {
+                          onUpdateStats(parsed);
+                          alert("Jornada restaurada com sucesso! Seu guerreiro foi carregado. 🧙‍♂️");
+                        }
+                      } else {
+                        alert("Arquivo inválido. Certifique-se de que é um arquivo de salvamento válido da CodeQuest.");
+                      }
+                    } catch (error) {
+                      alert("Erro ao decodificar o arquivo de salvamento.");
+                    }
+                  };
+                }
+              }}
+            />
+          </label>
         </div>
       </div>
 

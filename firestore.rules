@@ -20,6 +20,10 @@ service cloud.firestore {
       return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
     }
 
+    function isGuestId(id) {
+      return id is string && id.size() <= 128 && id.matches('^CQ-[A-Z0-9]+$');
+    }
+
     function incoming() {
       return request.resource.data;
     }
@@ -33,8 +37,8 @@ service cloud.firestore {
       return data.keys().hasAll([
         'xp', 'level', 'hearts', 'maxHearts', 'coins', 'streak', 
         'lastActiveDate', 'completedLessons', 'unlockedAchievements', 
-        'activeTrack', 'dailyMissions', 'userToken'
-      ]) && data.keys().size() == 12
+        'activeTrack', 'dailyMissions', 'userToken', 'avatar', 'nickname', 'lastHeartRegenTime'
+      ]) && data.keys().size() == 15
          && data.xp is int && data.xp >= 0
          && data.level is int && data.level >= 1
          && data.hearts is int && data.hearts >= 0
@@ -46,26 +50,29 @@ service cloud.firestore {
          && data.unlockedAchievements is list && data.unlockedAchievements.size() <= 50
          && data.activeTrack is string && (data.activeTrack == 'html' || data.activeTrack == 'css' || data.activeTrack == 'js')
          && data.dailyMissions is list && data.dailyMissions.size() <= 10
-         && data.userToken is string && data.userToken.size() <= 128;
+         && data.userToken is string && data.userToken.size() <= 128
+         && data.avatar is string && data.avatar.size() <= 128
+         && data.nickname is string && data.nickname.size() <= 128
+         && data.lastHeartRegenTime is string && data.lastHeartRegenTime.size() <= 128;
     }
 
     // Section for player accounts - only owner can access and modify their own record
     match /users/{userId} {
       allow get: if (isSignedIn() && userId == request.auth.uid)
-                    || (userId.startsWith('CQ-') && isValidId(userId));
+                    || isGuestId(userId);
       
       allow create: if (
                       (isSignedIn() && isEmailVerified() && userId == request.auth.uid)
-                      || (userId.startsWith('CQ-') && isValidId(userId))
+                      || isGuestId(userId)
                     ) && isValidUser(incoming());
                     
       allow update: if (
                       (isSignedIn() && isEmailVerified() && userId == request.auth.uid)
-                      || (userId.startsWith('CQ-') && isValidId(userId))
+                      || isGuestId(userId)
                     ) && isValidUser(incoming());
                     
       allow delete: if (isSignedIn() && isEmailVerified() && userId == request.auth.uid)
-                    || (userId.startsWith('CQ-') && isValidId(userId));
+                    || isGuestId(userId);
     }
   }
 }
