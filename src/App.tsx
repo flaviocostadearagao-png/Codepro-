@@ -157,6 +157,11 @@ export default function App() {
   const [activeLesson, setActiveLesson] = useState<Lesson | null>(null);
   const [levelUpMessage, setLevelUpMessage] = useState<string | null>(null);
 
+  // Scroll smoothly back to top on any tab/view layout transitions
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  }, [activeTab]);
+
   // Auth synchronization tracking states
   const [user, setUser] = useState<FirebaseUser | null>(null);
   const [authLoading, setAuthLoading] = useState(true);

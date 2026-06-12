@@ -125,6 +125,7 @@ export default function CodeEditorArea({
   const [testResults, setTestResults] = useState<{ id: string; passed: boolean; checked: boolean }[]>([]);
   const [consoleLogs, setConsoleLogs] = useState<string[]>([]);
   const [activeRightTab, setActiveRightTab] = useState<'preview' | 'console'>('preview');
+  const [mobileActiveTab, setMobileActiveTab] = useState<'instructions' | 'editor' | 'preview'>('instructions');
 
   // Iframe ref for HTML/CSS preview
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -211,6 +212,10 @@ export default function CodeEditorArea({
       // Initialize tests
       const initialTests = activeLesson.tests.map(t => ({ id: t.id, passed: false, checked: false }));
       setTestResults(initialTests);
+
+      // Reset mobile active tab and scroll cleanly to top
+      setMobileActiveTab('instructions');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }, [activeLesson?.id]);
 
@@ -663,14 +668,53 @@ export default function CodeEditorArea({
       setShakeActive(true);
       setTimeout(() => setShakeActive(false), 800);
       onCodeFailure();
+      
+      // Auto-toggle to instructions tab on small resolutions so they see the red indicators
+      setMobileActiveTab('instructions');
     }
   };
 
   return (
     <div className={`grid grid-cols-1 lg:grid-cols-12 gap-6 bg-slate-950 border border-slate-900 rounded-2xl p-4 md:p-6 shadow-2xl relative ${shakeActive ? 'animate-shake border-rose-500' : ''}`}>
       
+      {/* Mobile/Tablet Sub-Tab Selector (visible only below lg breakpoint) */}
+      <div className="lg:hidden col-span-1 flex bg-slate-900 p-1 rounded-xl border border-slate-800 gap-1.5 select-none w-full">
+        <button
+          onClick={() => setMobileActiveTab('instructions')}
+          className={`flex-1 py-2.5 px-3 rounded-lg text-xs font-black uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+            mobileActiveTab === 'instructions'
+              ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/10'
+              : 'text-slate-400 hover:text-slate-200 hover:bg-slate-850'
+          }`}
+        >
+          📖 Missão
+        </button>
+        <button
+          onClick={() => setMobileActiveTab('editor')}
+          className={`flex-1 py-2.5 px-3 rounded-lg text-xs font-black uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+            mobileActiveTab === 'editor'
+              ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/10'
+              : 'text-slate-400 hover:text-slate-200 hover:bg-slate-850'
+          }`}
+        >
+          💻 Editor
+        </button>
+        <button
+          onClick={() => setMobileActiveTab('preview')}
+          className={`flex-1 py-2.5 px-3 rounded-lg text-xs font-black uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+            mobileActiveTab === 'preview'
+              ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/10'
+              : 'text-slate-400 hover:text-slate-200 hover:bg-slate-850'
+          }`}
+        >
+          👁️ Live
+        </button>
+      </div>
+
       {/* 1. LEFT SIDEBAR: Instructions & Theory & Tests */}
-      <div className="col-span-1 lg:col-span-5 xl:col-span-4 bg-slate-900 border border-slate-800 rounded-xl p-5 flex flex-col justify-between h-[500px] lg:h-[550px] xl:h-[600px] overflow-y-auto">
+      <div className={`col-span-1 lg:col-span-5 xl:col-span-4 bg-slate-900 border border-slate-800 rounded-xl p-5 flex flex-col justify-between h-[500px] lg:h-[550px] xl:h-[600px] overflow-y-auto ${
+        mobileActiveTab === 'instructions' ? 'flex' : 'hidden lg:flex'
+      }`}>
         <div className="space-y-4">
           <div className="space-y-3 bg-slate-950 p-3 rounded-xl border border-slate-850">
             <div className="flex items-center justify-between gap-2">
@@ -802,7 +846,9 @@ export default function CodeEditorArea({
       </div>
 
       {/* 2. CENTER PANEL: Typing code playground */}
-      <div className="col-span-1 lg:col-span-7 xl:col-span-5 bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col justify-between h-[500px] lg:h-[550px] xl:h-[600px]">
+      <div className={`col-span-1 lg:col-span-7 xl:col-span-5 bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col justify-between h-[500px] lg:h-[550px] xl:h-[600px] ${
+        mobileActiveTab === 'editor' ? 'flex' : 'hidden lg:flex'
+      }`}>
         <div className="flex items-center justify-between border-b border-slate-800 pb-3 mb-3">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-rose-500 shadow shadow-rose-500/50" />
@@ -934,11 +980,31 @@ export default function CodeEditorArea({
         </div>
 
         {/* Submit & Status action bottom-line */}
-        <div className="flex items-center justify-between mt-4">
-          <div className="flex items-center gap-1.5 text-slate-400">
+        <div className="flex items-center justify-between mt-4 flex-wrap sm:flex-nowrap gap-4">
+          <div className="flex flex-col gap-1.5 text-slate-400">
             {hintBought && (
               <div className="p-2.5 bg-slate-950 border border-amber-550/30 rounded-lg font-sans text-[11px] text-amber-300 leading-normal animate-scale-in">
-                <strong>Dica de Sucesso:</strong> {activeLesson.hint}
+                <strong>Dica:</strong> {activeLesson.hint}
+              </div>
+            )}
+            
+            {/* Quick validation indicators at a glance */}
+            {testResults.some(r => r.checked) && (
+              <div className="flex items-center gap-1.5 bg-slate-950 p-1.5 px-2.5 rounded-lg border border-slate-850/60 font-mono text-[10px]">
+                <span className="text-[9px] uppercase tracking-wider text-slate-500 mr-1">Testes:</span>
+                {testResults.map((t, idx) => (
+                  <span
+                    key={t.id}
+                    className={`w-4 h-4 rounded-full flex items-center justify-center font-bold text-[9px] ${
+                      t.passed
+                        ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                        : 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
+                    }`}
+                    title={activeLesson.tests[idx]?.description}
+                  >
+                    {t.passed ? '✓' : '✗'}
+                  </span>
+                ))}
               </div>
             )}
           </div>
@@ -958,7 +1024,9 @@ export default function CodeEditorArea({
       </div>
 
       {/* 3. RIGHT SIDEBAR: Live sandbox visual checker */}
-      <div className="col-span-1 lg:col-span-12 xl:col-span-3 bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col justify-between h-[450px] lg:h-[350px] xl:h-[600px]">
+      <div className={`col-span-1 lg:col-span-12 xl:col-span-3 bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col justify-between h-[450px] lg:h-[350px] xl:h-[600px] ${
+        mobileActiveTab === 'preview' ? 'flex' : 'hidden lg:flex'
+      }`}>
         {/* Navigation widgets */}
         <div className="flex bg-slate-950 p-0.5 rounded-lg border border-slate-850 mb-3 font-semibold text-[11px]">
           <button
