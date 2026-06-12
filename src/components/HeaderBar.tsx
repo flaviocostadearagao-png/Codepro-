@@ -157,18 +157,30 @@ export default function HeaderBar({
         
         {/* User Brand & XP */}
         <div className="flex items-center gap-4 w-full xl:w-auto">
-          <div className="w-14 h-14 rounded-2xl bg-indigo-600 flex items-center justify-center font-bold text-2xl text-white shadow-lg border border-indigo-500 relative shrink-0">
-            {stats.level}
-            <div className="absolute -bottom-1.5 px-2 py-0.5 bg-slate-950 text-[9px] text-indigo-400 rounded-full font-bold border border-indigo-500/30 uppercase tracking-widest">
-              Lvl
+          <button
+            onClick={() => setShowCustomizer(!showCustomizer)}
+            className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-600 to-indigo-800 hover:from-indigo-500 hover:to-indigo-700 flex items-center justify-center shadow-lg border border-indigo-550 relative shrink-0 transition-all hover:scale-105 active:scale-95 cursor-pointer focus:outline-none"
+            title="Clique para personalizar seu herói!"
+          >
+            {user?.photoURL ? (
+              <img
+                src={user.photoURL}
+                className="w-full h-full rounded-2xl object-cover p-0.5"
+                alt="Avatar"
+                referrerPolicy="no-referrer"
+              />
+            ) : (
+              <span className="text-3xl select-none leading-none mt-[-2px]">{stats.avatar || '🥷'}</span>
+            )}
+            <div className="absolute -bottom-1.5 px-2 py-0.5 bg-slate-950 text-[10px] text-indigo-400 rounded-full font-bold border border-indigo-500/30 uppercase tracking-widest leading-none whitespace-nowrap shadow-md">
+              Lvl {stats.level}
             </div>
-          </div>
+          </button>
           <div className="flex-1 xl:flex-initial min-w-[240px]">
             <div className="flex flex-col mb-1.5">
               <div className="flex justify-between items-center text-xs font-semibold mb-0.5">
                 <span className="text-slate-200 flex items-center gap-1.5 hover:text-indigo-400 transition-colors cursor-pointer" onClick={() => setShowCustomizer(!showCustomizer)}>
-                  <span className="text-lg bg-slate-950 p-1 px-1.5 rounded-lg border border-slate-850 leading-none shadow-sm">{stats.avatar || '🥷'}</span>
-                  <span className="font-extrabold text-white text-sm tracking-wide flex items-center gap-1">
+                  <span className="font-extrabold text-white text-base tracking-wide flex items-center gap-1.5">
                     {stats.nickname || 'Recruta do Código'}
                     <span className="text-[10px] text-indigo-400 font-normal opacity-60">✏️</span>
                   </span>
