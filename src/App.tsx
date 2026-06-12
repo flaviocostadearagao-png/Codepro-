@@ -162,6 +162,27 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'auto' });
   }, [activeTab]);
 
+  // Auto-initialize current (first incomplete) lesson when user switches to editor tab
+  useEffect(() => {
+    if (activeTab === 'editor') {
+      const isDifferentTrack = activeLesson && activeLesson.track !== stats.activeTrack;
+      if (!activeLesson || isDifferentTrack) {
+        const trackLessons = SYLLABUS.filter((l) => l.track === stats.activeTrack);
+        const difficultyOrderObj: Record<string, number> = { iniciante: 1, intermediario: 2, avancado: 3 };
+        const sorted = [...trackLessons].sort((a, b) => {
+          if (a.difficulty !== b.difficulty) {
+            return difficultyOrderObj[a.difficulty] - difficultyOrderObj[b.difficulty];
+          }
+          return a.order - b.order;
+        });
+        const firstIncomplete = sorted.find((l) => !stats.completedLessons.includes(l.id)) || sorted[0];
+        if (firstIncomplete) {
+          setActiveLesson(firstIncomplete);
+        }
+      }
+    }
+  }, [activeTab, stats.activeTrack, stats.completedLessons, activeLesson]);
+
   // Auth synchronization tracking states
   const [user, setUser] = useState<FirebaseUser | null>(null);
   const [authLoading, setAuthLoading] = useState(true);

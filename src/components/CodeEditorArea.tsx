@@ -125,7 +125,7 @@ export default function CodeEditorArea({
   const [testResults, setTestResults] = useState<{ id: string; passed: boolean; checked: boolean }[]>([]);
   const [consoleLogs, setConsoleLogs] = useState<string[]>([]);
   const [activeRightTab, setActiveRightTab] = useState<'preview' | 'console'>('preview');
-  const [mobileActiveTab, setMobileActiveTab] = useState<'instructions' | 'editor' | 'preview'>('instructions');
+  const [mobileActiveTab, setMobileActiveTab] = useState<'instructions' | 'editor' | 'preview'>('editor');
 
   // Iframe ref for HTML/CSS preview
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -213,9 +213,11 @@ export default function CodeEditorArea({
       const initialTests = activeLesson.tests.map(t => ({ id: t.id, passed: false, checked: false }));
       setTestResults(initialTests);
 
-      // Reset mobile active tab and scroll cleanly to top
-      setMobileActiveTab('instructions');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      // Reset mobile active tab to 'editor' because they starting/entering a lesson and want to code immediately
+      setMobileActiveTab('editor');
+      setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }, 60);
     }
   }, [activeLesson?.id]);
 
@@ -675,8 +677,7 @@ export default function CodeEditorArea({
       setTimeout(() => setShakeActive(false), 800);
       onCodeFailure();
       
-      // Auto-toggle to instructions tab on small resolutions so they see the red indicators
-      setMobileActiveTab('instructions');
+      // We no longer auto-toggle tabs on failure to ensure they can stay on the editor tab with inline errors visible.
     }
   };
 
@@ -718,7 +719,7 @@ export default function CodeEditorArea({
       </div>
 
       {/* 1. LEFT SIDEBAR: Instructions & Theory & Tests */}
-      <div className={`col-span-1 lg:col-span-5 xl:col-span-4 bg-slate-900 border border-slate-800 rounded-xl p-5 flex flex-col justify-between h-[500px] lg:h-[550px] xl:h-[600px] overflow-y-auto ${
+      <div className={`col-span-1 lg:col-span-5 xl:col-span-4 bg-slate-900 border border-slate-800 rounded-xl p-5 flex flex-col justify-between h-auto lg:h-[550px] xl:h-[600px] overflow-y-auto ${
         mobileActiveTab === 'instructions' ? 'flex' : 'hidden lg:flex'
       }`}>
         <div className="space-y-4">
@@ -852,7 +853,7 @@ export default function CodeEditorArea({
       </div>
 
       {/* 2. CENTER PANEL: Typing code playground */}
-      <div className={`col-span-1 lg:col-span-7 xl:col-span-5 bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col justify-between h-[500px] lg:h-[550px] xl:h-[600px] ${
+      <div className={`col-span-1 lg:col-span-7 xl:col-span-5 bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col justify-between h-auto lg:h-[550px] xl:h-[600px] ${
         mobileActiveTab === 'editor' ? 'flex' : 'hidden lg:flex'
       }`}>
         <div className="flex items-center justify-between border-b border-slate-800 pb-3 mb-3">
@@ -894,6 +895,17 @@ export default function CodeEditorArea({
           </div>
         </div>
 
+        {/* Compact instructions directly in editor tab for mobile to avoid back-and-forth tab switching */}
+        <div className="lg:hidden bg-slate-950 p-2.5 rounded-lg border border-slate-850 space-y-1 mb-2">
+          <div className="flex justify-between items-center text-[9px] text-amber-400 font-extrabold uppercase tracking-wider">
+            <span>🎯 Diretrizes da Missão:</span>
+            <span className="text-[8px] text-slate-500 font-medium">Visível no Editor</span>
+          </div>
+          <p className="text-[11px] text-slate-300 font-bold leading-relaxed">
+            {activeLesson.task}
+          </p>
+        </div>
+
         {/* Shortcuts and suggestions panel above the editor */}
         <div className="mb-2 bg-slate-950 p-2 rounded-lg border border-slate-850 flex flex-col gap-1 select-none">
           <div className="flex items-center justify-between text-[10px] text-indigo-400 font-extrabold uppercase tracking-wider">
@@ -914,7 +926,7 @@ export default function CodeEditorArea({
         </div>
 
         {/* The code IDE editable zone */}
-        <div className="flex-1 w-full bg-slate-950 rounded-lg p-3 border border-slate-850 flex font-mono text-xs relative overflow-hidden group">
+        <div className="min-h-[220px] lg:flex-1 w-full bg-slate-950 rounded-lg p-3 border border-slate-850 flex font-mono text-xs relative overflow-hidden group">
           {/* Code line numbers */}
           <div className="text-slate-600 select-none text-right pr-3 border-r border-slate-850 space-y-1 text-[11px]">
             {Array.from({ length: 24 }).map((_, i) => (
@@ -988,6 +1000,21 @@ export default function CodeEditorArea({
         {/* Submit & Status action bottom-line */}
         <div className="flex items-center justify-between mt-4 flex-wrap sm:flex-nowrap gap-4">
           <div className="flex flex-col gap-1.5 text-slate-400">
+            {/* Inline list of failed guidelines so they don't have to leave the Editor screen on failure */}
+            {testResults.some(r => r.checked && !r.passed) && (
+              <div className="p-2.5 bg-rose-500/15 border border-rose-500/30 rounded-lg font-sans text-[10px] text-rose-300 leading-normal animate-scale-in max-w-xs md:max-w-md">
+                <span className="font-extrabold text-rose-400 flex items-center gap-1 mb-1">
+                  ❌ Ajustes necessários no código:
+                </span>
+                <ul className="list-disc pl-3.5 space-y-0.5">
+                  {testResults.filter(r => !r.passed).map((r) => {
+                    const testInfo = activeLesson.tests.find(t => t.id === r.id);
+                    return testInfo ? <li key={r.id} className="font-medium">{testInfo.description}</li> : null;
+                  })}
+                </ul>
+              </div>
+            )}
+
             {hintBought && (
               <div className="p-2.5 bg-slate-950 border border-amber-550/30 rounded-lg font-sans text-[11px] text-amber-300 leading-normal animate-scale-in">
                 <strong>Dica:</strong> {activeLesson.hint}
