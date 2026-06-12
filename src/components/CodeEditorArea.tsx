@@ -142,24 +142,28 @@ export default function CodeEditorArea({
     const newVal = currentVal.substring(0, start) + snippet + currentVal.substring(end);
     setCode(newVal);
 
-    // Focus back and set cursor position
+    // Focus back and set cursor position with safe error shielding
     setTimeout(() => {
-      textarea.focus();
-      // Calculate a smart cursor placement offset
-      let offset = snippet.length;
-      if (snippet.endsWith('">')) {
-        offset = snippet.length - 2;
-      } else if (snippet.includes('=""')) {
-        offset = snippet.indexOf('=""') + 2; 
-      } else if (snippet.includes('()')) {
-        offset = snippet.indexOf('()') + 1;
-      } else if (snippet.includes('{}')) {
-        offset = snippet.indexOf('{}') + 1;
-      } else if (snippet.startsWith('<') && snippet.endsWith('>') && !snippet.startsWith('</') && !snippet.endsWith('/>')) {
-        offset = snippet.length;
-      }
+      try {
+        textarea.focus();
+        // Calculate a smart cursor placement offset
+        let offset = snippet.length;
+        if (snippet.endsWith('">')) {
+          offset = snippet.length - 2;
+        } else if (snippet.includes('=""')) {
+          offset = snippet.indexOf('=""') + 2; 
+        } else if (snippet.includes('()')) {
+          offset = snippet.indexOf('()') + 1;
+        } else if (snippet.includes('{}')) {
+          offset = snippet.indexOf('{}') + 1;
+        } else if (snippet.startsWith('<') && snippet.endsWith('>') && !snippet.startsWith('</') && !snippet.endsWith('/>')) {
+          offset = snippet.length;
+        }
 
-      textarea.selectionStart = textarea.selectionEnd = start + offset;
+        textarea.selectionStart = textarea.selectionEnd = start + offset;
+      } catch (err) {
+        // Fallback for touch interface or old browser version limitations
+      }
     }, 0);
   };
 
@@ -203,7 +207,20 @@ export default function CodeEditorArea({
   // Load lesson code
   useEffect(() => {
     if (activeLesson) {
-      setCode(activeLesson.initialCode);
+      // Load saved draft or regular initialCode
+      let savedDraft: string | null = null;
+      try {
+        if (typeof window !== 'undefined') {
+          savedDraft = localStorage.getItem(`cq_draft_${activeLesson.id}`);
+        }
+      } catch (e) {}
+
+      if (savedDraft !== null) {
+        setCode(savedDraft);
+      } else {
+        setCode(activeLesson.initialCode);
+      }
+
       setHintBought(stats.completedLessons.includes(activeLesson.id)); // free hint if already solved
       setSuccessMode(false);
       setConsoleLogs([]);
@@ -216,67 +233,94 @@ export default function CodeEditorArea({
       // Reset mobile active tab to 'editor' because they starting/entering a lesson and want to code immediately
       setMobileActiveTab('editor');
       setTimeout(() => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        try {
+          if (typeof window !== 'undefined') {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }
+        } catch (err) {
+          try {
+            window.scrollTo(0, 0);
+          } catch (e) {}
+        }
       }, 60);
     }
   }, [activeLesson?.id]);
 
-  // Handle immediate visual response in iframe (for HTML / CSS preview)
+  // Reactive Autosave User Draft to Local Storage
+  useEffect(() => {
+    if (activeLesson && code !== undefined && code !== null) {
+      try {
+        if (typeof window !== 'undefined') {
+          localStorage.setItem(`cq_draft_${activeLesson.id}`, code);
+        }
+      } catch (err) {
+        // Silently capture storage limit or permission constraints
+      }
+    }
+  }, [code, activeLesson?.id]);
+
+  // Handle immediate visual response in iframe (for HTML / CSS preview) with responsive debounce to eliminate typing lag
   useEffect(() => {
     if (!activeLesson || activeLesson.track === 'js' || !iframeRef.current) return;
     
-    // Inject CSS or HTML appropriately
-    let documentContent = '';
-    if (activeLesson.track === 'html') {
-      documentContent = `
-        <!doctype html>
-        <html>
-          <head>
-            <style>
-              body { font-family: 'Inter', sans-serif; color: white; padding: 15px; margin: 0; background-color: #0b1329; }
-              h1, h2, h3 { margin-top: 0; color: #6366f1; }
-              ul { padding-left: 20px; }
-              li { margin-bottom: 5px; }
-              a { color: #f59e0b; font-weight: bold; }
-              img { border-radius: 8px; margin-top: 10px; border: 1px solid #1e293b; max-width: 100%; height: auto; }
-              table { border-collapse: collapse; width: 100%; margin-top: 12px; }
-              th, td { border: 1px solid #334155; padding: 8px; text-align: left; }
-              th { background-color: #1e293b; color: #818cf8; }
-              select, textarea, input, button { background-color: #1e293b; border: 1px solid #475569; color: white; padding: 6px 12px; border-radius: 6px; font-size: 13px; }
-              button { background-color: #10b981; border: none; cursor: pointer; font-weight: bold; }
-              button:hover { background-color: #059669; }
-            </style>
-          </head>
-          <body>
-            ${code}
-          </body>
-        </html>
-      `;
-    } else if (activeLesson.track === 'css') {
-      // Simulate HTML context for CSS
-      const sampleHTML = getCSSContextHTML(activeLesson.id);
-      documentContent = `
-        <!doctype html>
-        <html>
-          <head>
-            <style>
-              body { font-family: 'Inter', sans-serif; color: white; padding: 15px; margin: 0; background-color: #0b1329; }
+    const timeoutId = setTimeout(() => {
+      // Inject CSS or HTML appropriately
+      let documentContent = '';
+      if (activeLesson.track === 'html') {
+        documentContent = `
+          <!doctype html>
+          <html>
+            <head>
+              <style>
+                body { font-family: 'Inter', sans-serif; color: white; padding: 15px; margin: 0; background-color: #0b1329; }
+                h1, h2, h3 { margin-top: 0; color: #6366f1; }
+                ul { padding-left: 20px; }
+                li { margin-bottom: 5px; }
+                a { color: #f59e0b; font-weight: bold; }
+                img { border-radius: 8px; margin-top: 10px; border: 1px solid #1e293b; max-width: 100%; height: auto; }
+                table { border-collapse: collapse; width: 100%; margin-top: 12px; }
+                th, td { border: 1px solid #334155; padding: 8px; text-align: left; }
+                th { background-color: #1e293b; color: #818cf8; }
+                select, textarea, input, button { background-color: #1e293b; border: 1px solid #475569; color: white; padding: 6px 12px; border-radius: 6px; font-size: 13px; }
+                button { background-color: #10b981; border: none; cursor: pointer; font-weight: bold; }
+                button:hover { background-color: #059669; }
+              </style>
+            </head>
+            <body>
               ${code}
-            </style>
-          </head>
-          <body>
-            ${sampleHTML}
-          </body>
-        </html>
-      `;
-    }
+            </body>
+          </html>
+        `;
+      } else if (activeLesson.track === 'css') {
+        // Simulate HTML context for CSS
+        const sampleHTML = getCSSContextHTML(activeLesson.id);
+        documentContent = `
+          <!doctype html>
+          <html>
+            <head>
+              <style>
+                body { font-family: 'Inter', sans-serif; color: white; padding: 15px; margin: 0; background-color: #0b1329; }
+                ${code}
+              </style>
+            </head>
+            <body>
+              ${sampleHTML}
+            </body>
+          </html>
+        `;
+      }
 
-    const iframeDoc = iframeRef.current.contentDocument || iframeRef.current.contentWindow?.document;
-    if (iframeDoc) {
-      iframeDoc.open();
-      iframeDoc.write(documentContent);
-      iframeDoc.close();
-    }
+      if (iframeRef.current) {
+        const iframeDoc = iframeRef.current.contentDocument || iframeRef.current.contentWindow?.document;
+        if (iframeDoc) {
+          iframeDoc.open();
+          iframeDoc.write(documentContent);
+          iframeDoc.close();
+        }
+      }
+    }, 400); // 400ms debounce gives a highly responsive feel while ensuring zero-lag typing!
+
+    return () => clearTimeout(timeoutId);
   }, [code, activeLesson]);
 
   if (!activeLesson) {
@@ -893,6 +937,11 @@ export default function CodeEditorArea({
               onClick={() => {
                 if (window.confirm('Tem certeza que deseja redefinir o código inicial deste desafio?')) {
                   setCode(activeLesson.initialCode);
+                  if (activeLesson) {
+                    try {
+                      localStorage.removeItem(`cq_draft_${activeLesson.id}`);
+                    } catch (e) {}
+                  }
                   setTestResults(activeLesson.tests.map(t => ({ id: t.id, passed: false, checked: false })));
                 }
               }}
@@ -951,8 +1000,8 @@ export default function CodeEditorArea({
         {/* The code IDE editable zone */}
         <div className="min-h-[220px] lg:flex-1 w-full bg-slate-950 rounded-lg p-3 border border-slate-850 flex font-mono text-xs relative overflow-hidden group">
           {/* Code line numbers */}
-          <div className="text-slate-600 select-none text-right pr-3 border-r border-slate-850 space-y-1 text-[11px]">
-            {Array.from({ length: 24 }).map((_, i) => (
+          <div className="text-slate-600 select-none text-right pr-3 border-r border-slate-850 space-y-1 text-[11px] h-full overflow-hidden shrink-0">
+            {Array.from({ length: Math.max(16, (code || '').split('\n').length) }).map((_, i) => (
               <div key={i}>{i + 1}</div>
             ))}
           </div>
@@ -961,6 +1010,9 @@ export default function CodeEditorArea({
             ref={textareaRef}
             value={code}
             onChange={(e) => setCode(e.target.value)}
+            autoCapitalize="off"
+            autoComplete="off"
+            autoCorrect="off"
             onKeyDown={(e) => {
               const textarea = e.currentTarget;
               const start = textarea.selectionStart;

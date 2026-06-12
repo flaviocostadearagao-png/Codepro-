@@ -159,7 +159,15 @@ export default function App() {
 
   // Scroll smoothly back to top on any tab/view layout transitions
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'auto' });
+    try {
+      if (typeof window !== 'undefined') {
+        window.scrollTo({ top: 0, behavior: 'auto' });
+      }
+    } catch (err) {
+      try {
+        window.scrollTo(0, 0);
+      } catch (e) {}
+    }
   }, [activeTab]);
 
   // Auto-initialize current (first incomplete) lesson when user switches to editor tab
