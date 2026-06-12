@@ -939,8 +939,8 @@ export const SYLLABUS: Lesson[] = [
     solutionExample: '<details>\n  <summary>Segredos Cósmicos</summary>\n  <p>Parabéns, você colocou detalhes!</p>\n</details>',
     tests: [
       { id: 't1', description: 'Deve carregar elemento contêiner expansível <details>', ruleType: 'regex', expected: '<details[^>]*>[\\s\\S]*<\\/details>' },
-      { id: 't2', description: 'O details deve possuir um botão rígido <summary> com o título correto', ruleType: 'regex', expected: '<summary[^>]*>\\s*Segredos\\s+C(?:ó|o)smicos\\s*<\\/summary>' },
-      { id: 't3', description: 'Deve carregar a resposta envolta em parágrafo <p>', ruleType: 'regex', expected: '<p[^>]*>[\\s\\S]*?Parab(é|e)ns,\\s*voc[ê|e]\\s+colocou\\s+detalhes\\s*!?\\s*[\\s\\S]*?<\\/p>' }
+      { id: 't2', description: 'O details deve possuir um botão rígido <summary> com o título correto', ruleType: 'regex', expected: '<summary[^>]*>[\\s\\S]*?Segredos[\\s\\S]*?C(?:ó|o)smicos[\\s\\S]*?<\\/summary>' },
+      { id: 't3', description: 'Deve carregar a resposta envolta em parágrafo <p>', ruleType: 'regex', expected: '<p[^>]*>[\\s\\S]*?Parab(?:é|e)ns[\\s\\S]*?colocou[\\s\\S]*?detalhes[\\s\\S]*?<\\/p>' }
     ],
     hint: 'Escreva <details> de forma geral. Aninhe dentro o <summary>Segredos Cósmicos</summary> e em seguida o parágrafo explicativo.',
     coinsReward: 45,
@@ -1099,10 +1099,10 @@ export const SYLLABUS: Lesson[] = [
     initialCode: '<!-- Forje o cartão de perfil pessoal completo -->\n',
     solutionExample: '<h1>Aventureiro Iniciante</h1>\n<p>Minhas metas de aprendizado:</p>\n<ul>\n  <li>Aprender HTML</li>\n  <li>Dominar CSS</li>\n</ul>\n<a href="https://codequest.com">Voltar ao Início</a>',
     tests: [
-      { id: 't1', description: 'Deve possuir o visualizador de cabeçalho principal <h1> com o texto adequado', ruleType: 'regex', expected: '<h1[^>]*>\\s*Aventureiro\\s+Iniciante\\s*<\\/h1>' },
-      { id: 't2', description: 'Deve possuir o enunciado de parágrafo <p> correto', ruleType: 'regex', expected: '<p[^>]*>[\\s\\S]*?Minhas\\s+metas\\s+de\\s+aprendizado[\\s\\S]*?<\\/p>' },
-      { id: 't3', description: 'Deve possuir a lista não ordenada com itens detalhados "Aprender HTML" e "Dominar CSS"', ruleType: 'regex', expected: '<ul[^>]*>[\\s\\S]*?<li>\\s*Aprender\\s+HTML\\s*<\\/li>[\\s\\S]*?<li>\\s*Dominar\\s+CSS\\s*<\\/li>[\\s\\S]*?<\\/ul>' },
-      { id: 't4', description: 'Deve fechar com o botão a hiperlink apontando para https://codequest.com e texto Voltar ao Início', ruleType: 'regex', expected: '<a[^>]*href="https:\\/\\/codequest\\.com\\/?"[^>]*>\\s*Voltar\\s+ao\\s+In(?:í|i)cio\\s*<\\/a>' }
+      { id: 't1', description: 'Deve possuir o visualizador de cabeçalho principal <h1> com o texto adequado', ruleType: 'regex', expected: '<h1[^>]*>[\\s\\S]*?Aventureiro[\\s\\S]*?Iniciante[\\s\\S]*?<\\/h1>' },
+      { id: 't2', description: 'Deve possuir o enunciado de parágrafo <p> correto', ruleType: 'regex', expected: '<p[^>]*>[\\s\\S]*?Minhas[\\s\\S]*?metas[\\s\\S]*?(?:de)?[\\s\\S]*?aprendizado[\\s\\S]*?<\\/p>' },
+      { id: 't3', description: 'Deve possuir a lista não ordenada com itens detalhados "Aprender HTML" e "Dominar CSS"', ruleType: 'regex', expected: '<ul[^>]*>[\\s\\S]*?<li>[\\s\\S]*?Aprender[\\s\\S]*?HTML[\\s\\S]*?<\\/li>[\\s\\S]*?<li>[\\s\\S]*?Dominar[\\s\\S]*?CSS[\\s\\S]*?<\\/li>[\\s\\S]*?<\\/ul>' },
+      { id: 't4', description: 'Deve fechar com o botão a hiperlink apontando para https://codequest.com e texto Voltar ao Início', ruleType: 'regex', expected: '<a[^>]*href=["\']https?:\\/\\/(?:www\\.)?codequest\\.com\\/?["\'][^>]*>[\\s\\S]*?Voltar[\\s\\S]*?In(?:í|i)cio[\\s\\S]*?<\\/a>' }
     ],
     hint: 'Preencha de forma consecutiva cada um dos quatro elementos solicitados cuidando para fechar cada uma das tags (h1, p, ul, li e a).',
     coinsReward: 40,
