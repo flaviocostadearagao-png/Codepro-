@@ -617,14 +617,16 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans p-3 md:p-6 pb-20 relative overflow-x-hidden">
+    <div className={`min-h-screen bg-slate-950 text-slate-100 font-sans relative overflow-x-hidden ${
+      activeTab === 'editor' ? 'p-0 lg:p-6 pb-2 lg:pb-20' : 'p-3 md:p-6 pb-20'
+    }`}>
       
       {/* Background radial overlays */}
       <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-indigo-500/5 rounded-full blur-3xl -z-10 pointer-events-none" />
       <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-emerald-500/5 rounded-full blur-3xl -z-10 pointer-events-none" />
 
       {/* Primary Layout Frame */}
-      <div className="max-w-7xl mx-auto space-y-6">
+      <div className={`max-w-7xl mx-auto ${activeTab === 'editor' ? 'space-y-0 lg:space-y-6' : 'space-y-6'}`}>
         
         {/* Global Level Up Pop Notification */}
         {levelUpMessage && (
@@ -634,23 +636,25 @@ export default function App() {
         )}
 
         {/* Dynamic header widgets */}
-        <HeaderBar
-          stats={stats}
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
-          onHeal={handleHeal}
-          onSelectTrack={handleSelectTrack}
-          user={user}
-          authLoading={authLoading}
-          onSignIn={handleSignIn}
-          onSignOut={handleSignOut}
-          onLoadToken={loadProgressByToken}
-          onResetStats={handleResetStats}
-          onUpdateStats={(updatedFields) => setStats(prev => ({ ...prev, ...updatedFields }))}
-        />
+        <div className={activeTab === 'editor' ? 'hidden lg:block' : ''}>
+          <HeaderBar
+            stats={stats}
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            onHeal={handleHeal}
+            onSelectTrack={handleSelectTrack}
+            user={user}
+            authLoading={authLoading}
+            onSignIn={handleSignIn}
+            onSignOut={handleSignOut}
+            onLoadToken={loadProgressByToken}
+            onResetStats={handleResetStats}
+            onUpdateStats={(updatedFields) => setStats(prev => ({ ...prev, ...updatedFields }))}
+          />
+        </div>
 
         {/* Tab display routing switcher */}
-        <main className="min-h-[500px]">
+        <main className={activeTab === 'editor' ? 'min-h-0 lg:min-h-[500px]' : 'min-h-[500px]'}>
           {activeTab === 'map' && (
             <MapJourney
               stats={stats}
@@ -686,7 +690,9 @@ export default function App() {
       </div>
 
       {/* Global Minimal Footer */}
-      <footer className="mt-12 text-center text-slate-600 text-xs border-t border-slate-900 pt-6 max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
+      <footer className={`mt-12 text-center text-slate-600 text-xs border-t border-slate-900 pt-6 max-w-7xl mx-auto flex-col sm:flex-row justify-between items-center gap-2 ${
+        activeTab === 'editor' ? 'hidden lg:flex' : 'flex'
+      }`}>
         <p>CodeQuest © 2026. Todos os direitos reservados.</p>
         <div className="flex gap-4">
           <span className="hover:text-slate-400 cursor-pointer">Arquiteto de Software</span>

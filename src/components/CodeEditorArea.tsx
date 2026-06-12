@@ -682,8 +682,31 @@ export default function CodeEditorArea({
   };
 
   return (
-    <div className={`grid grid-cols-1 lg:grid-cols-12 gap-6 bg-slate-950 border border-slate-900 rounded-2xl p-4 md:p-6 shadow-2xl relative ${shakeActive ? 'animate-shake border-rose-500' : ''}`}>
+    <div className={`grid grid-cols-1 lg:grid-cols-12 gap-3.5 lg:gap-6 bg-slate-950 border-x-0 border-t-0 lg:border border-slate-900 rounded-none lg:rounded-2xl p-3 sm:p-4 lg:p-6 shadow-2xl relative ${shakeActive ? 'animate-shake border-rose-500' : ''}`}>
       
+      {/* Mobile/Tablet Compact Navigation & Stats bar */}
+      <div className="lg:hidden col-span-1 flex items-center justify-between bg-slate-900 p-2.5 rounded-xl border border-slate-800 gap-2 w-full">
+        <button
+          onClick={onClose}
+          className="flex items-center gap-1 py-1.5 px-3 rounded-lg text-xs font-bold uppercase bg-slate-950 hover:bg-slate-850 text-slate-300 border border-slate-800 cursor-pointer transition-all active:scale-95"
+        >
+          <ArrowLeft size={12} /> Voltar ao Mapa
+        </button>
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 bg-slate-950 px-2 py-1 rounded-md border border-slate-850 text-[11px] font-black text-rose-400">
+            <span>❤️</span> {stats.hearts}
+          </div>
+          <div className="flex items-center gap-1 bg-slate-950 px-2 py-1 rounded-md border border-slate-850 text-[11px] font-black text-amber-400">
+            <span>🪙</span> {stats.coins}
+          </div>
+          {stats.streak > 0 && (
+            <div className="flex items-center gap-1 bg-slate-950 px-2 py-1 rounded-md border border-slate-850 text-[11px] font-black text-amber-500">
+              <span>🔥</span> {stats.streak}
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Mobile/Tablet Sub-Tab Selector (visible only below lg breakpoint) */}
       <div className="lg:hidden col-span-1 flex bg-slate-900 p-1 rounded-xl border border-slate-800 gap-1.5 select-none w-full">
         <button
