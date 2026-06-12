@@ -1100,7 +1100,7 @@ export const SYLLABUS: Lesson[] = [
     solutionExample: '<h1>Aventureiro Iniciante</h1>\n<p>Minhas metas de aprendizado:</p>\n<ul>\n  <li>Aprender HTML</li>\n  <li>Dominar CSS</li>\n</ul>\n<a href="https://codequest.com">Voltar ao Início</a>',
     tests: [
       { id: 't1', description: 'Deve possuir o visualizador de cabeçalho principal <h1> com o texto adequado', ruleType: 'regex', expected: '<h1[^>]*>[\\s\\S]*?Aventureiro[\\s\\S]*?Iniciante[\\s\\S]*?<\\/h1>' },
-      { id: 't2', description: 'Deve possuir o enunciado de parágrafo <p> correto', ruleType: 'regex', expected: '<p[^>]*>[\\s\\S]*?Minhas[\\s\\S]*?metas[\\s\\S]*?(?:de)?[\\s\\S]*?aprendizado[\\s\\S]*?<\\/p>' },
+      { id: 't2', description: 'Deve possuir o enunciado de parágrafo <p> correto', ruleType: 'regex', expected: '<p[^>]*>[\\s\\S]*?(?:meta|aprend|estud|objetiv)[\\s\\S]*?<\\/p>' },
       { id: 't3', description: 'Deve possuir a lista não ordenada com itens detalhados "Aprender HTML" e "Dominar CSS"', ruleType: 'regex', expected: '<ul[^>]*>[\\s\\S]*?<li>[\\s\\S]*?Aprender[\\s\\S]*?HTML[\\s\\S]*?<\\/li>[\\s\\S]*?<li>[\\s\\S]*?Dominar[\\s\\S]*?CSS[\\s\\S]*?<\\/li>[\\s\\S]*?<\\/ul>' },
       { id: 't4', description: 'Deve fechar com o botão a hiperlink apontando para https://codequest.com e texto Voltar ao Início', ruleType: 'regex', expected: '<a[^>]*href=["\']https?:\\/\\/(?:www\\.)?codequest\\.com\\/?["\'][^>]*>[\\s\\S]*?Voltar[\\s\\S]*?In(?:í|i)cio[\\s\\S]*?<\\/a>' }
     ],
