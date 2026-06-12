@@ -370,14 +370,14 @@ export default function MapJourney({ stats, onStartLesson }: MapJourneyProps) {
 
       {/* IMMERSIVE CENTERED DIALOG MODAL FOR SELECTED LESSON */}
       {selectedLesson && (
-        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 transition-all animate-fade-in">
-          <div className="bg-slate-900 border-2 border-indigo-500/40 rounded-2xl p-6 md:p-8 shadow-2xl space-y-5 max-w-xl w-full animate-scale-in text-slate-200 relative">
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 overflow-y-auto p-4 flex justify-center items-start md:items-center transition-all animate-fade-in">
+          <div className="bg-slate-900 border-2 border-indigo-500/40 rounded-2xl p-5 md:p-7 shadow-2xl space-y-4 max-w-xl w-full my-auto animate-scale-in text-slate-200 relative">
             <div className="flex justify-between items-start">
               <div>
                 <span className="px-2.5 py-0.5 text-[9px] font-bold bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 rounded-full uppercase tracking-widest font-mono">
                   MÓDULO: {selectedLesson.difficulty.toUpperCase()}
                 </span>
-                <h4 className="text-xl font-black font-sans text-white mt-2 tracking-wide leading-tight">{selectedLesson.title}</h4>
+                <h4 className="text-lg md:text-xl font-black font-sans text-white mt-1.5 tracking-wide leading-tight">{selectedLesson.title}</h4>
               </div>
               <button
                 onClick={() => setSelectedLesson(null)}
@@ -389,7 +389,7 @@ export default function MapJourney({ stats, onStartLesson }: MapJourneyProps) {
 
             <div className="h-px bg-slate-800 w-full" />
 
-            <div className="space-y-4 text-xs leading-relaxed">
+            <div className="space-y-3 text-xs leading-relaxed">
               <div>
                 <span className="text-[10px] uppercase font-bold text-indigo-400 tracking-wider">Quest Primordial:</span>
                 <p className="text-slate-300 mt-1 pl-1">{selectedLesson.description}</p>
@@ -397,7 +397,7 @@ export default function MapJourney({ stats, onStartLesson }: MapJourneyProps) {
 
               <div>
                 <span className="text-[10px] uppercase font-bold text-emerald-400 tracking-wider">O Conceito Secreto:</span>
-                <div className="p-3 bg-slate-950 rounded-lg border border-slate-850 mt-1 font-mono text-[11px] text-slate-300 whitespace-pre-line leading-relaxed">
+                <div className="p-3 bg-slate-950 rounded-lg border border-slate-850 mt-1 font-mono text-[11px] text-slate-300 whitespace-pre-line leading-relaxed max-h-[140px] overflow-y-auto scrollbar-thin">
                   {selectedLesson.concept}
                 </div>
               </div>
@@ -410,7 +410,7 @@ export default function MapJourney({ stats, onStartLesson }: MapJourneyProps) {
               </div>
             </div>
 
-            <div className="flex gap-4 p-3 bg-slate-950 rounded-xl border border-slate-850 justify-around text-center">
+            <div className="flex gap-4 p-2.5 bg-slate-950 rounded-xl border border-slate-850 justify-around text-center">
               <div>
                 <div className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Recompensa</div>
                 <div className="text-sm font-black text-indigo-400 flex items-center gap-1 justify-center mt-0.5">
@@ -426,10 +426,10 @@ export default function MapJourney({ stats, onStartLesson }: MapJourneyProps) {
               </div>
             </div>
 
-            <div className="flex gap-3 pt-2">
+            <div className="flex gap-3 pt-1">
               <button
                 onClick={() => setSelectedLesson(null)}
-                className="flex-1 py-3 bg-slate-800 hover:bg-slate-750 text-slate-300 font-extrabold text-xs uppercase rounded-xl border border-slate-700 tracking-wider transition-all cursor-pointer active:scale-[0.98]"
+                className="flex-1 py-2.5 bg-slate-800 hover:bg-slate-750 text-slate-300 font-extrabold text-xs uppercase rounded-xl border border-slate-700 tracking-wider transition-all cursor-pointer active:scale-[0.98]"
               >
                 Voltar ao Mapa
               </button>
@@ -438,7 +438,7 @@ export default function MapJourney({ stats, onStartLesson }: MapJourneyProps) {
                   onStartLesson(selectedLesson);
                   setSelectedLesson(null);
                 }}
-                className="flex-1 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-black text-xs uppercase rounded-xl tracking-wider shadow-lg flex items-center justify-center gap-2 transition-all cursor-pointer hover:shadow-emerald-500/10 active:scale-[0.98]"
+                className="flex-1 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-black text-xs uppercase rounded-xl tracking-wider shadow-lg flex items-center justify-center gap-2 transition-all cursor-pointer hover:shadow-emerald-500/10 active:scale-[0.98]"
               >
                 Iniciar Lição <ChevronRight size={14} />
               </button>

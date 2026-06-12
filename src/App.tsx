@@ -596,7 +596,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans p-3 md:p-6 pb-20 select-none relative overflow-x-hidden">
+    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans p-3 md:p-6 pb-20 relative overflow-x-hidden">
       
       {/* Background radial overlays */}
       <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-indigo-500/5 rounded-full blur-3xl -z-10 pointer-events-none" />

@@ -297,7 +297,13 @@ export default function CodeEditorArea({
 
     return (
       <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 md:p-8 shadow-2xl max-w-4xl mx-auto my-6 space-y-6 animate-scale-in text-slate-200">
-        <div className="text-center space-y-2 border-b border-slate-800 pb-6">
+        <div className="text-center space-y-2 border-b border-slate-800 pb-6 relative">
+          <button
+            onClick={onClose}
+            className="md:absolute top-0 right-0 mt-2 md:mt-0 py-1.5 px-3 rounded-lg text-xs font-bold bg-slate-950 hover:bg-slate-850 text-slate-400 border border-slate-800 hover:text-white cursor-pointer transition-all flex items-center gap-1.5 mx-auto"
+          >
+            <ArrowLeft size={12} /> Voltar ao Mapa
+          </button>
           <div className="w-16 h-16 rounded-full bg-slate-950 flex items-center justify-center text-3xl border border-slate-850 mx-auto">
             💻
           </div>
@@ -1099,8 +1105,8 @@ export default function CodeEditorArea({
 
       {/* 4. CONGRATULATIONS / SUCCESS MODAL OVERLAY */}
       {successMode && (
-        <div className="absolute inset-0 bg-slate-950/95 z-50 rounded-2xl flex items-center justify-center p-6 animate-scale-in">
-          <div className="max-w-md w-full bg-slate-900 border-2 border-indigo-500 rounded-2xl p-6 text-center shadow-2xl relative overflow-hidden">
+        <div className="absolute inset-0 bg-slate-950/95 z-50 rounded-2xl overflow-y-auto p-4 md:p-6 flex justify-center items-start md:items-center animate-scale-in">
+          <div className="max-w-md w-full bg-slate-900 border-2 border-indigo-500 rounded-2xl p-5 md:p-6 text-center shadow-2xl relative overflow-hidden my-auto">
             {/* Ambient burst visual */}
             <div className="absolute -top-10 -left-10 w-24 h-24 bg-indigo-500/20 blur-2xl rounded-full" />
             <div className="absolute -bottom-10 -right-10 w-24 h-24 bg-emerald-500/20 blur-2xl rounded-full" />
