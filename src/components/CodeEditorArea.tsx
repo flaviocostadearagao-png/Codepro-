@@ -852,28 +852,78 @@ export default function CodeEditorArea({
             </div>
           </div>
 
+          {/* TUTORIAL SIMPLES DE COMO JOGAR / PASSOS DA MISSÃO */}
+          {activeLesson.isTest ? (
+            <div className="bg-gradient-to-r from-rose-950/40 to-slate-950 p-3 rounded-xl border border-rose-500/20 text-[11px] text-slate-300 space-y-1.5 shadow-inner">
+              <span className="font-extrabold text-rose-400 flex items-center gap-1 uppercase tracking-wider text-[10px]">
+                🎯 Teste de Conhecimento: Sem Ajuda Rúnica!
+              </span>
+              <p className="text-slate-300 leading-relaxed font-semibold">
+                Este é um <strong className="text-white">Desafio de Avaliação</strong> para testar seu poder de programação. Sem teoria nem tutoriais: apenas você e os desafios práticos!
+              </p>
+              <ol className="list-decimal pl-4.5 space-y-1 font-medium leading-relaxed text-slate-300">
+                <li>
+                  <strong className="text-white">Analise as Instruções:</strong> Leia com atenção as diretrizes de código na <span className="text-amber-400 font-bold">Instruções do Desafio</span> abaixo.
+                </li>
+                <li>
+                  <strong className="text-white">Escreva a Solução:</strong> Digite seu código no editor central sem nenhum template de apoio teórico.
+                </li>
+                <li>
+                  <strong className="text-white">Prove sua Força:</strong> Clique no botão verde de <span className="text-emerald-400 font-bold">Executar Código</span> para validar suas respostas!
+                </li>
+              </ol>
+            </div>
+          ) : (
+            <div className="bg-gradient-to-r from-indigo-950/40 to-slate-950 p-3 rounded-xl border border-indigo-500/20 text-[11px] text-slate-300 space-y-1.5 shadow-inner">
+              <span className="font-extrabold text-indigo-400 flex items-center gap-1 uppercase tracking-wider text-[10px]">
+                🧭 Guia de Ajuda: O que fazer nesta lição?
+              </span>
+              <ol className="list-decimal pl-4.5 space-y-1.5 font-medium leading-relaxed text-slate-300">
+                <li>
+                  <strong className="text-white">Estude com a Lore:</strong> Leia a <span className="text-indigo-400 font-bold">Lore Teórica</span> abaixo para entender as regras do elemento de código solicitado.
+                </li>
+                <li>
+                  <strong className="text-white">Complete a Missão:</strong> No editor central, substitua ou escreva o código correspondente que satisfaça os requisitos da <span className="text-amber-400 font-bold">Missão Prática</span>.
+                </li>
+                <li>
+                  <strong className="text-white">Valide o seu Código:</strong> Clique no botão verde de <span className="text-emerald-400 font-bold">Executar Código</span> no canto inferior direito para testar seu código e vencer o desafio!
+                </li>
+              </ol>
+            </div>
+          )}
+
           <div className="flex justify-between items-start pt-1">
             <div>
-              <span className="px-2 py-0.5 rounded-full bg-slate-950 text-slate-450 border border-slate-850 uppercase font-black text-[9px] tracking-widest leading-none">
-                {activeLesson.track.toUpperCase()} • {activeLesson.difficulty.toUpperCase()}
+              <span className={`px-2 py-0.5 rounded-full uppercase font-black text-[9px] tracking-widest leading-none border ${
+                activeLesson.isTest
+                  ? 'bg-rose-500/10 border-rose-500/30 text-rose-400'
+                  : 'bg-slate-950 text-slate-450 border-slate-850'
+              }`}>
+                {activeLesson.isTest ? 'TESTE • DESAFIO' : `${activeLesson.track.toUpperCase()} • ${activeLesson.difficulty.toUpperCase()}`}
               </span>
-              <h3 className="text-base font-bold text-white mt-1.5 leading-snug">{activeLesson.title}</h3>
+              <h3 className="text-base font-bold text-white mt-1.5 leading-snug">
+                {activeLesson.isTest ? `⚔️ ${activeLesson.title}` : activeLesson.title}
+              </h3>
             </div>
           </div>
 
           <div className="h-px bg-slate-800" />
 
           {/* Theoretical Core */}
-          <div className="text-xs">
-            <span className="text-[10px] uppercase font-bold tracking-wider text-indigo-400">Lore Teórica</span>
-            <p className="text-slate-300 mt-1 leading-relaxed bg-slate-950/50 p-3 rounded-lg border border-slate-850 font-sans">
-              {activeLesson.concept}
-            </p>
-          </div>
+          {!activeLesson.isTest && (
+            <div className="text-xs">
+              <span className="text-[10px] uppercase font-bold tracking-wider text-indigo-400">Lore Teórica</span>
+              <p className="text-slate-300 mt-1 leading-relaxed bg-slate-950/50 p-3 rounded-lg border border-slate-850 font-sans">
+                {activeLesson.concept}
+              </p>
+            </div>
+          )}
 
           {/* Practical task instructions */}
           <div className="text-xs">
-            <span className="text-[10px] uppercase font-bold tracking-wider text-amber-400">Missão Prática</span>
+            <span className="text-[10px] uppercase font-bold tracking-wider text-amber-400">
+              {activeLesson.isTest ? 'Instruções do Desafio' : 'Missão Prática'}
+            </span>
             <div className="bg-amber-500/5 text-slate-200 p-3 rounded-lg border border-amber-500/20 mt-1 font-semibold leading-relaxed border-l-4 border-l-amber-500">
               {activeLesson.task}
             </div>

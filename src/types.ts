@@ -30,6 +30,7 @@ export interface Lesson {
   coinsReward: number;
   xpReward: number;
   order: number;
+  isTest?: boolean;
 }
 
 export interface Achievement {

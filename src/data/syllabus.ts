@@ -1639,6 +1639,200 @@ export const SYLLABUS: Lesson[] = [
     coinsReward: 60,
     xpReward: 350,
     order: 21
+  },
+  // ==================== CHECKPOINT TEST MODULES (isTest: true) ====================
+  // --- HTML TESTS ---
+  {
+    id: 'html_ini_test',
+    title: 'Teste de Iniciante: Pergaminho de Boas-vindas',
+    description: 'Um teste de conhecimentos puramente prático. Mostre que domina a criação de cabeçalhos, parágrafos e listas.',
+    concept: '',
+    track: 'html',
+    difficulty: 'iniciante',
+    task: 'Crie as seguintes tags consecutivas:\n1. Um título principal <h1> contendo o texto "Arsenal de Guerra".\n2. Um parágrafo <p> contendo "Os heróis se preparam.".\n3. Uma lista não ordenada <ul> com dois itens <li>: "Tridente" e "Martelo" (nessa ordem).',
+    initialCode: '<!-- Seu teste de HTML Iniciante. Escreva o código aqui sem ajuda teórica! -->\n',
+    solutionExample: '<h1>Arsenal de Guerra</h1>\n<p>Os heróis se preparam.</p>\n<ul>\n  <li>Tridente</li>\n  <li>Martelo</li>\n</ul>',
+    tests: [
+      { id: 't1', description: 'Deve possuir o cabeçalho principal <h1> contendo "Arsenal de Guerra"', ruleType: 'regex', expected: '<h1[^>]*>[\\s\\S]*?Arsenal\\s+de\\s+Guerra[\\s\\S]*?<\\/h1>' },
+      { id: 't2', description: 'Deve possuir o enunciado de parágrafo <p> contendo "Os heróis se preparam."', ruleType: 'regex', expected: '<p[^>]*>[\\s\\S]*?Os\\s+her(?:ó|o)is\\s+se\\s+preparam\\.?[\\s\\S]*?<\\/p>' },
+      { id: 't3', description: 'Deve possuir a lista não ordenada <ul> com dois itens <li>: "Tridente" e "Martelo"', ruleType: 'regex', expected: '<ul[^>]*>[\\s\\S]*?<li>\\s*Tridente\\s*<\\/li>[\\s\\S]*?<li>\\s*Martelo\\s*<\\/li>[\\s\\S]*?<\\/ul>' }
+    ],
+    hint: 'Escreva de forma consecutiva as tags <h1>, <p> e a lista de suprimentos <ul> com seus respectivos filhos <li>.',
+    coinsReward: 50,
+    xpReward: 250,
+    order: 99,
+    isTest: true
+  },
+  {
+    id: 'html_int_test',
+    title: 'Teste de Intermediário: Inscrição de Clãs',
+    description: 'Um teste prático para validar formulários, inputs com atributos específicos e botões.',
+    concept: '',
+    track: 'html',
+    difficulty: 'intermediario',
+    task: 'Monte uma estrutura de formulário composta por:\n1. Uma tag <form> de abertura e fechamento.\n2. Um <input> com type="text", id="nome-guerreiro" e o atributo "required".\n3. Um botão <button> de type="submit" com o texto "Enviar Cadastro".',
+    initialCode: '<!-- Seu teste de HTML Intermediário. Escreva o código aqui! -->\n',
+    solutionExample: '<form>\n  <input type="text" id="nome-guerreiro" required />\n  <button type="submit">Enviar Cadastro</button>\n</form>',
+    tests: [
+      { id: 't1', description: 'Deve conter a tag de abertura e fechamento <form>', ruleType: 'regex', expected: '<form[^>]*>[\\s\\S]*<\\/form>' },
+      { id: 't2', description: 'Deve conter o input com type="text", id="nome-guerreiro" e required', ruleType: 'regex', expected: '<input[^>]*type=["\']text["\'][^>]*id=["\']nome-guerreiro["\'][^>]*required|<input[^>]*id=["\']nome-guerreiro["\'][^>]*type=["\']text["\'][^>]*required|<input[^>]*required[^>]*id=["\']nome-guerreiro["\'][^>]*type=["\']text["\']|<input[^>]*required[^>]*type=["\']text["\'][^>]*id=["\']nome-guerreiro["\']' },
+      { id: 't3', description: 'Deve conter o botão de submit com o texto "Enviar Cadastro"', ruleType: 'regex', expected: 'type="submit"[^>]*>\\s*Enviar\\s+Cadastro\\s*<\\/button>|<button[^>]*>\\s*Enviar\\s+Cadastro\\s*<\\/button>' }
+    ],
+    hint: 'Assinale o input com os atributos id e required, e o botão de submit dentro do formulário pai.',
+    coinsReward: 60,
+    xpReward: 300,
+    order: 99,
+    isTest: true
+  },
+  {
+    id: 'html_adv_test',
+    title: 'Teste de Avançado: Mídia Semântica Resiliente',
+    description: 'O derradeiro teste estrutural de HTML envolvendo tags semânticas de alta responsividade de imagens.',
+    concept: '',
+    track: 'html',
+    difficulty: 'avancado',
+    task: 'Crie um bloco nativo de imagens usando picture composto por:\n1. Uma tag contêiner de abertura e fechamento <picture>.\n2. Uma tag <source> interna com media="(min-width: 600px)" e srcset="combate.jpg".\n3. Uma tag <img /> logo abaixo com src="repouso.jpg" e alt="Portal".',
+    initialCode: '<!-- Seu teste de HTML Avançado. Escreva o código aqui! -->\n',
+    solutionExample: '<picture>\n  <source media="(min-width: 600px)" srcset="combate.jpg">\n  <img src="repouso.jpg" alt="Portal" />\n</picture>',
+    tests: [
+      { id: 't1', description: 'Deve conter o contêiner estrutural <picture>', ruleType: 'regex', expected: '<picture>[\\s\\S]*<\\/picture>' },
+      { id: 't2', description: 'Deve conter o <source> com o media query e srcset configurados', ruleType: 'regex', expected: '<source[^>]*media=["\']\\s*\\(\\s*min-width:\\s*600px\\s*\\)\\s*["\'][^>]*srcset=["\']combate\\.jpg["\']|<source[^>]*srcset=["\']combate\\.jpg["\'][^>]*media=["\']\\s*\\(\\s*min-width:\\s*600px\\s*\\)\\s*["\']' },
+      { id: 't3', description: 'Deve conter a tag de imagem backup <img> com o fallback correto', ruleType: 'regex', expected: '<img[^>]*src=["\']repouso\\.jpg["\'][^>]*alt=["\']Portal["\']|<img[^>]*alt=["\']Portal["\'][^>]*src=["\']repouso\\.jpg["\']' }
+    ],
+    hint: 'Agrupe a imagem e o source de forma ordenada dentro de <picture> para que o navegador renderize de acordo com as telas.',
+    coinsReward: 70,
+    xpReward: 350,
+    order: 99,
+    isTest: true
+  },
+
+  // --- CSS TESTS ---
+  {
+    id: 'css_ini_test',
+    title: 'Teste de Iniciante: O Cartão Imperial',
+    description: 'Teste seus conhecimentos de estruturação, cantos curvos e colorização com propriedades essenciais do CSS.',
+    concept: '',
+    track: 'css',
+    difficulty: 'iniciante',
+    task: 'Desenvolva as regras de estilo para a classe `.card-guerreiro` contendo:\n1. Uma cor de fundo vermelha (`background-color: red;`).\n2. Cantos arredondados de `12px` de raio (`border-radius: 12px;`).\n3. Uma cor de texto branca sólida (`color: white;`).',
+    initialCode: '.card-guerreiro {\n  /* Escreva suas regras de estilo aqui sem tutoriais */\n  \n}',
+    solutionExample: '.card-guerreiro {\n  background-color: red;\n  border-radius: 12px;\n  color: white;\n}',
+    tests: [
+      { id: 't1', description: 'Deve criar as regras de escopo para a classe .card-guerreiro', ruleType: 'regex', expected: '\\.card-guerreiro\\s*\\{' },
+      { id: 't2', description: 'Deve definir a cor de fundo com "red"', ruleType: 'regex', expected: 'background-color\\s*:\\s*red\\s*;' },
+      { id: 't3', description: 'Deve definir border-radius com "12px"', ruleType: 'regex', expected: 'border-radius\\s*:\\s*12px\\s*;' },
+      { id: 't4', description: 'Deve definir color com "white"', ruleType: 'regex', expected: 'color\\s*:\\s*white\\s*;' }
+    ],
+    hint: 'Abra os colchetes para .card-guerreiro e lance verticalmente as três propriedades requeridas com ponto e vírgula no final de cada uma.',
+    coinsReward: 50,
+    xpReward: 250,
+    order: 99,
+    isTest: true
+  },
+  {
+    id: 'css_int_test',
+    title: 'Teste de Intermediário: Grid de Defesa do Reino',
+    description: 'Use a força do CSS Grid para subdividir terrenos em colunas dimensionáveis sem quebrar o layout.',
+    concept: '',
+    track: 'css',
+    difficulty: 'intermediario',
+    task: 'Estilize la classe `.templo-grid` com as propriedades de Grid:\n1. Ative a renderização de grade (`display: grid;`).\n2. Aloque 3 colunas iguais usando repeat de uma fração (`grid-template-columns: repeat(3, 1fr);`).\n3. Estabeleça um espaçamento (gap) de `20px` entre células vizinhas (`gap: 20px;`).',
+    initialCode: '.templo-grid {\n  /* Forje o painel de grid da catedral de defesa */\n  \n}',
+    solutionExample: '.templo-grid {\n  display: grid;\n  grid-template-columns: repeat(3, 1fr);\n  gap: 20px;\n}',
+    tests: [
+      { id: 't1', description: 'Deve definir display: grid;', ruleType: 'regex', expected: 'display\\s*:\\s*grid\\s*;' },
+      { id: 't2', description: 'Deve possuir grid-template-columns com a sintaxe repeat(3, 1fr)', ruleType: 'regex', expected: 'grid-template-columns\\s*:\\s*repeat\\s*\\(\\s*3\\s*,\\s*1fr\\s*\\)' },
+      { id: 't3', description: 'Deve possuir espaçamento gap de 20px', ruleType: 'regex', expected: 'gap\\s*:\\s*20px\\s*;' }
+    ],
+    hint: 'Insira display: grid; seguido da definição repeat e do espaçamento gap na classe .templo-grid.',
+    coinsReward: 60,
+    xpReward: 300,
+    order: 99,
+    isTest: true
+  },
+  {
+    id: 'css_adv_test',
+    title: 'Teste de Avançado: O Portal Sussurrante',
+    description: 'Projete uma animação @keyframes complexa de transformação e invoque o loop sem interrupções.',
+    concept: '',
+    track: 'css',
+    difficulty: 'avancado',
+    task: 'Crie uma animação de pulsação e aplique-a:\n1. Defina um `@keyframes flutuar` que mude de `from { transform: translateY(0); }` para `to { transform: translateY(-10px); }`.\n2. Estilize a classe `.portal-flutuante` aplicando essa animação com tempo de `2s`, comportamento contínuo `infinite` e alternado `alternate`.',
+    initialCode: '/* Teste Avançado: Keyframes e Animation */\n',
+    solutionExample: '@keyframes flutuar {\n  from {\n    transform: translateY(0);\n  }\n  to {\n    transform: translateY(-10px);\n  }\n}\n.portal-flutuante {\n  animation: flutuar 2s infinite alternate;\n}',
+    tests: [
+      { id: 't1', description: 'Deve declarar o elemento @keyframes flutuar com as transformações corretas', ruleType: 'regex', expected: '@keyframes\\s+flutuar\\s*\\{[\\s\\S]*?from[\\s\\S]*?translateY\\(\\s*0\\s*\\)[\\s\\S]*?to[\\s\\S]*?translateY\\(\\s*-10px\\s*\\)' },
+      { id: 't2', description: 'Deve aplicar a animação na classe .portal-flutuante de modo alternado e infinito', ruleType: 'regex', expected: '\\.portal-flutuante\\s*\\{[\\s\\S]*?animation\\s*:\\s*flutuar\\s+2s\\s+infinite\\s+alternate' }
+    ],
+    hint: 'Lembre-se de criar o bloco @keyframes flutuar primeiro, e depois associá-lo à regra .portal-flutuante usando a propriedade animation.',
+    coinsReward: 70,
+    xpReward: 350,
+    order: 99,
+    isTest: true
+  },
+
+  // --- JS TESTS ---
+  {
+    id: 'js_ini_test',
+    title: 'Teste de Iniciante: Divisor de Recompensas',
+    description: 'Chegou o momento de mostrar seu controle sobre funções, variáveis e lógica matemática em JavaScript.',
+    concept: '',
+    track: 'js',
+    difficulty: 'iniciante',
+    task: 'Escreva uma função clássica nomeada `somarBaus(bauA, bauB)`. Ela deve aceitar dois números representando tesouros em moedas de ouro de cada baú, e retornar a somatória de ambos com a instrução `return`.',
+    initialCode: 'function somarBaus(bauA, bauB) {\n  // Forje a união das riquezas do clã\n  \n}',
+    solutionExample: 'function somarBaus(bauA, bauB) {\n  return bauA + bauB;\n}',
+    tests: [
+      { id: 't1', description: 'Deve declarar a função tradicional somarBaus coletando os dois baús', ruleType: 'regex', expected: 'function\\s+somarBaus\\s*\\(\\s*bauA\\s*,\\s*bauB\\s*\\)' },
+      { id: 't2', description: 'A função deve retornar a soma simples de seus argumentos', ruleType: 'regex', expected: 'return\\s+bauA\\s*\\+\\s*bauB|return\\s+bauB\\s*\\+\\s*bauA' }
+    ],
+    hint: 'Defina function somarBaus(bauA, bauB) e escreva return bauA + bauB; no seu escopo.',
+    coinsReward: 50,
+    xpReward: 250,
+    order: 99,
+    isTest: true
+  },
+  {
+    id: 'js_int_test',
+    title: 'Teste de Intermediário: Selo de Seleção de Armas Raras',
+    description: 'Filtre listas de objetos velozmente utilizando loops imutáveis funcionais de alta performance no JS.',
+    concept: '',
+    track: 'js',
+    difficulty: 'intermediario',
+    task: 'Crie uma função clássica denominada `filtrarRaras(armas)`. O parâmetro é um array de objetos, onde cada item possui uma propriedade `raro` (booleano). A função deve retornar uma lista composta exclusivamente pelas armas cujo campo `raro` seja `true`, utilizando para isso o método nativo `.filter()`.',
+    initialCode: 'function filtrarRaras(armas) {\n  // Filtre as armas raras e devolva a nova coleção\n  \n}',
+    solutionExample: 'function filtrarRaras(armas) {\n  return armas.filter(arma => arma.raro);\n}',
+    tests: [
+      { id: 't1', description: 'Deve criar a assinatura da função filtrarRaras', ruleType: 'regex', expected: 'function\\s+filtrarRaras\\s*\\(\\s*armas\\s*\\)' },
+      { id: 't2', description: 'Deve invocar o método de array .filter', ruleType: 'regex', expected: '\\.filter\\(' },
+      { id: 't3', description: 'Deve retornar os registros correspondentes que possuem a flag de raridade ativa', ruleType: 'regex', expected: 'arma\\s*=>\\s*arma\\.raro|arma\\s*=>\\s*arma\\.raro\\s*===\\s*true|function\\s*\\(\\s*\\w+\\s*\\)\\s*\\{\\s*return\\s+\\w+\\.raro' }
+    ],
+    hint: 'Use a instrução return armas.filter(arma => arma.raro); dentro do corpo da sua função.',
+    coinsReward: 60,
+    xpReward: 300,
+    order: 99,
+    isTest: true
+  },
+  {
+    id: 'js_adv_test',
+    title: 'Teste de Avançado: Processando Dados do Clã',
+    description: 'Demonstre maestria com operações síncronas que dependem de fluxos assíncronos do Node e navegadores.',
+    concept: '',
+    track: 'js',
+    difficulty: 'avancado',
+    task: 'Codifique uma função assíncrona chamada `carregarArmaria(servidor)`. Dentro de seu escopo, utilize o operador `await` guardando a resposta provinda de `servidor.getEquipamentos()` em uma constante `dados`, e retorne-a no final.',
+    initialCode: '// Crie a rotina assíncrona com async e await\n',
+    solutionExample: 'async function carregarArmaria(servidor) {\n  const dados = await servidor.getEquipamentos();\n  return dados;\n}',
+    tests: [
+      { id: 't1', description: 'A função deve ser declarada como assíncrona com identificação async', ruleType: 'regex', expected: 'async\\s+function\\s+carregarArmaria\\s*\\(\\s*servidor\\s*\\)' },
+      { id: 't2', description: 'Deve realizar o await na chamada do método do servidor', ruleType: 'regex', expected: 'await\\s+servidor\\.getEquipamentos\\s*\\(\\s*\\)' },
+      { id: 't3', description: 'Deve retornar os dados obtidos', ruleType: 'regex', expected: 'return\\s+' }
+    ],
+    hint: 'Adicione async antes da função e suspenda a execução com await servidor.getEquipamentos(); antes de efetuar o retorno.',
+    coinsReward: 70,
+    xpReward: 350,
+    order: 99,
+    isTest: true
   }
 ];
 
